@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Análise de Emoções - Vibe Metrics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        /* Classes de Gradiente Customizadas */
+        .gradient-blue-purple { background-image: linear-gradient(to right, #3b82f6, #9333ea); }
+        .gradient-yellow-orange { background-image: linear-gradient(to right, #fbbf24, #f97316); }
+        .gradient-amber-brown { background-image: linear-gradient(to right, #f59e0b, #78350f); }
+        .gradient-orange-red { background-image: linear-gradient(to right, #f97316, #ef4444); }
+        .gradient-green-teal { background-image: linear-gradient(to right, #10b981, #14b8a6); }
+        .gradient-green-soft { background-image: linear-gradient(to right, #84cc16, #22c55e); }
+        .gradient-red-dark { background-image: linear-gradient(to right, #ef4444, #1f2937); }
+        .gradient-red-black { background-image: linear-gradient(to right, #b91c1c, #000000); }
+        .gradient-red-orange { background-image: linear-gradient(to right, #f87171, #f97316); }
+        .gradient-purple-black { background-image: linear-gradient(to right, #a855f7, #000000); }
+        .gradient-pink-red { background-image: linear-gradient(to right, #ec4899, #ef4444); }
+        .gradient-rose-red { background-image: linear-gradient(to right, #f43f5e, #b91c1c); }
+        .gradient-fuchsia-pink { background-image: linear-gradient(to right, #d946ef, #ec4899); }
+        .gradient-fuchsia-dark { background-image: linear-gradient(to right, #a21caf, #581c87); }
+        .gradient-indigo-purple { background-image: linear-gradient(to right, #6366f1, #a855f7); }
+
+        /* Estilo do Overlay de Carregamento */
+        #loadingOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background-color: rgba(3, 7, 18, 0.95); /* Gray-950 com opacidade */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+
+        #loadingOverlay.hidden-fade {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Spinner Animado */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(34, 197, 94, 0.2);
+            border-top: 5px solid #22c55e;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-950 text-white h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <div id="loadingOverlay">
+        <div class="spinner mb-4"></div>
+        <p class="text-green-500 font-bold animate-pulse text-lg">Analisando suas vibrações...</p>
+        <p class="text-gray-400 text-sm mt-2">Estamos processando suas músicas</p>
+    </div>
+
+    <header class="w-full bg-gray-900 px-6 py-4 flex items-center justify-between border-b border-gray-800 md:hidden">
+        <div class="flex items-center gap-2">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="logo" class="w-6 h-6">
+            <h1 class="text-xl font-semibold">Vibe Metrics - Spotify</h1>
+        </div>
+        <button id="mobileMenu" class="text-white text-2xl">☰</button>
+    </header>
+
+    <aside class="w-64 bg-gray-900 flex flex-col p-6 border-r border-gray-800 hidden md:flex shrink-0">
+        <div class="flex items-center gap-2 mb-10 cursor-pointer" onclick="window.location.href='/'">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="logo" class="w-6 h-6">
+            <h1 class="text-xl font-semibold">Vibe Metrics</h1>
+        </div>
+        <nav class="flex flex-col gap-4">
+            <a href="/static/dashboard.html" class="text-gray-300 hover:text-green-500 transition">🎧 Visão Geral</a>
+            <a href="/static/artistas.html" class="text-gray-300 hover:text-green-500 transition">👥 Artistas</a>
+            <a href="/static/musicas.html" class="text-gray-300 hover:text-green-500 transition">🎵 Músicas</a>
+            <a href="/static/emocoes.html" class="text-green-500 font-bold transition border-l-4 border-green-500 pl-2">🧠 Emoções IA</a>
+        </nav>
+        <div class="mt-auto">
+            <button id="logoutButton" class="w-full bg-green-500 hover:bg-green-600 text-black font-semibold py-2 rounded-full mt-10 transition">Sair</button>
+        </div>
+    </aside>
+
+    <main id="mainContent" class="flex-1 overflow-y-auto p-4 md:p-10">
+        <header class="mb-6 animate-fadeIn">
+            <h2 class="text-2xl md:text-4xl font-bold mb-1">Emoções em Pauta 🧠</h2>
+            <p class="text-gray-400 text-sm md:text-lg">Como suas músicas moldam sua visão de mundo.</p>
+        </header>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 animate-fadeIn" style="animation-delay: 0.2s;">
+            <div id="top1SentimentCard" class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-lg font-bold text-blue-400">--</h3>
+                    <span class="text-gray-500 text-xs bg-gray-800 px-2 py-1 rounded">Top 1</span>
+                </div>
+                <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full" style="width: 0%;"></div>
+                </div>
+                <p class="text-gray-500 text-[10px] mt-1 text-right">--% Intensidade</p>
+            </div>
+
+            <div id="top2SentimentCard" class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-lg font-bold text-yellow-400">--</h3>
+                    <span class="text-gray-500 text-xs bg-gray-800 px-2 py-1 rounded">Top 2</span>
+                </div>
+                <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full" style="width: 0%;"></div>
+                </div>
+                <p class="text-gray-500 text-[10px] mt-1 text-right">--% Intensidade</p>
+            </div>
+
+            <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow-lg flex items-center justify-between">
+                <div>
+                    <p class="text-gray-400 text-xs uppercase font-bold">Mais Frequente</p>
+                    <p id="frequentEmotionText" class="text-2xl font-extrabold text-green-400 mt-1">--</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-500">Presente em</p>
+                    <p id="frequentEmotionCount" class="text-sm font-bold text-white">-- faixas</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="profileTextSection" class="mb-6 bg-gradient-to-br from-gray-900 to-gray-800 p-5 rounded-2xl border border-gray-700 shadow-xl animate-fadeIn" style="animation-delay: 0.4s;">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded shadow">IA Analysis</span>
+                <h3 class="text-lg font-bold text-white">Seu Perfil Emocional</h3>
+            </div>
+            <div class="prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed text-sm">
+                <p id="emotionProfileText">Processando...</p>
+            </div>
+        </section>
+
+        <section id="top1DetailedAnalysis" class="mb-6 animate-fadeIn" style="animation-delay: 0.6s;">
+            <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow-xl flex flex-col md:flex-row gap-5">
+                <div class="md:w-1/3 flex flex-col items-center text-center">
+                    <img id="top1TrackImage" src="" alt="" class="w-32 h-32 md:w-48 md:h-48 rounded-lg shadow-lg mb-3 bg-gray-800">
+                    <p id="top1TrackName" class="text-lg font-bold text-white">--</p>
+                    <p id="top1ArtistName" class="text-sm text-gray-400">--</p>
+                    <p id="top1TrackHighlight" class="text-xs font-semibold mt-1">--</p>
+                </div>
+                <div class="md:w-2/3 flex flex-col justify-center">
+                    <h3 id="top1AnalysisTitle" class="text-xl font-bold text-white mb-3 border-b border-gray-700 pb-1">--</h3>
+                    <blockquote class="border-l-4 pl-4 py-2 my-3 bg-gray-950/50 rounded">
+                        <p id="top1Citation" class="italic text-gray-300">"--"</p>
+                    </blockquote>
+                    <p id="top1Explanation" class="text-sm text-gray-400 mt-2 leading-relaxed">--</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="top2DetailedAnalysis" class="mb-6 animate-fadeIn" style="animation-delay: 0.8s;">
+            <div class="bg-gray-900 p-5 rounded-2xl border border-gray-800 shadow-xl flex flex-col md:flex-row gap-5">
+                <div class="md:w-1/3 flex flex-col items-center text-center">
+                    <img id="top2TrackImage" src="" alt="" class="w-32 h-32 md:w-48 md:h-48 rounded-lg shadow-lg mb-3 bg-gray-800">
+                    <p id="top2TrackName" class="text-lg font-bold text-white">--</p>
+                    <p id="top2ArtistName" class="text-sm text-gray-400">--</p>
+                    <p id="top2TrackHighlight" class="text-xs font-semibold mt-1">--</p>
+                </div>
+                <div class="md:w-2/3 flex flex-col justify-center">
+                    <h3 id="top2AnalysisTitle" class="text-xl font-bold text-white mb-3 border-b border-gray-700 pb-1">--</h3>
+                    <blockquote class="border-l-4 pl-4 py-2 my-3 bg-gray-950/50 rounded">
+                        <p id="top2Citation" class="italic text-gray-300">"--"</p>
+                    </blockquote>
+                    <p id="top2Explanation" class="text-sm text-gray-400 mt-2 leading-relaxed">--</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+    import {endereco_em_uso} from "/static/utils.js"
+        const API_PERFIL_MUSICAL_URL = `${endereco_em_uso}/api/v1/user/perfil-musical`;
+        const HOME_URL = "/";
+
+        const EMOTION_MAP = {
+            'alegria': { color: 'yellow', emoji: '😄', gradient: 'gradient-yellow-orange' },
+            'otimismo': { color: 'yellow', emoji: '✨', gradient: 'gradient-yellow-orange' },
+            'esperanca': { color: 'green', emoji: '🌈', gradient: 'gradient-green-teal' },
+            'introspeccao': { color: 'indigo', emoji: '🤔', gradient: 'gradient-indigo-purple' },
+            'paz': { color: 'green', emoji: '🧘', gradient: 'gradient-green-soft' },
+            'amor': { color: 'pink', emoji: '❤️', gradient: 'gradient-pink-red' },
+            'tristeza': { color: 'indigo', emoji: '😔', gradient: 'bg-indigo-700' },
+            'melancolia': { color: 'indigo', emoji: '🌧️', gradient: 'bg-indigo-700' },
+            'nostalgia': { color: 'amber', emoji: '📼', gradient: 'gradient-amber-brown' },
+            'raiva': { color: 'red', emoji: '😡', gradient: 'gradient-red-dark' },
+            'desilusao_amorosa': { color: 'rose', emoji: '💔', gradient: 'gradient-rose-red' },
+            'desespero': { color: 'red', emoji: '🚨', gradient: 'gradient-red-black' },
+            'rebeldia': { color: 'red', emoji: '🤘', gradient: 'gradient-red-orange' },
+            'medo': { color: 'purple', emoji: '😨', gradient: 'gradient-purple-black' },
+            'anseio': { color: 'orange', emoji: '🔥', gradient: 'gradient-orange-red' },
+            'autoafirmacao': { color: 'blue', emoji: '💪', gradient: 'gradient-blue-purple' },
+            'sensualidade': { color: 'fuchsia', emoji: '💋', gradient: 'gradient-fuchsia-pink' },
+            'sexual_explicit': { color: 'fuchsia', emoji: '🔞', gradient: 'gradient-fuchsia-dark' },
+            'default': { color: 'gray', emoji: '📊', gradient: 'bg-gray-700' }
+        };
+
+        function capitalize(str) {
+            if (!str) return 'Desconhecido';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Função para esconder o Overlay
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('hidden-fade');
+            document.body.classList.remove('overflow-hidden'); // Habilita o scroll
+        }
+
+        function populateTopSentimentCard(cardElementId, analysisSectionId, sentimentData, rank) {
+            const data = sentimentData;
+            const meta = EMOTION_MAP[data.nome.toLowerCase()] || EMOTION_MAP.default;
+            const intensityPercent = Math.round(data.intensidade * 100 + 35);
+            const color = meta.color;
+            const gradientClass = meta.gradient;
+            const faixa = data.faixa;
+            const analise = faixa.analise;
+            
+            const card = document.getElementById(cardElementId);
+            if (card) {
+                card.querySelector('h3').innerHTML = `${capitalize(data.nome)} ${meta.emoji}`;
+                card.querySelector('h3').className = `text-lg font-bold text-${color}-400`;
+                card.querySelector('.text-gray-500.text-xs').textContent = `Top ${rank}`;
+                card.querySelector('.text-gray-500.text-right').textContent = `${intensityPercent}% Intensidade`;
+
+                const gradientDiv = card.querySelector('.w-full > div');
+                if (gradientDiv) {
+                    gradientDiv.style.width = `${intensityPercent}%`;
+                    gradientDiv.className = `h-full rounded-full ${gradientClass}`;
+                }
+            }
+            
+            const section = document.getElementById(analysisSectionId);
+            if (section) {
+                const innerDiv = section.querySelector('.bg-gray-900');
+                innerDiv.className = `bg-gray-900 p-5 rounded-2xl border border-${color}-500 shadow-xl flex flex-col md:flex-row gap-5`;
+
+                section.querySelector('#top' + rank + 'TrackImage').src = faixa.link_imagem;
+                section.querySelector('#top' + rank + 'TrackName').textContent = faixa.nome_faixa;
+                section.querySelector('#top' + rank + 'ArtistName').textContent = faixa.artista_principal;
+                
+                const highlightText = section.querySelector('#top' + rank + 'TrackHighlight');
+                highlightText.textContent = `Destaque em ${capitalize(data.nome)} (${intensityPercent}%)`;
+                highlightText.className = `text-xs text-${color}-400 font-semibold mt-1`;
+
+                section.querySelector('#top' + rank + 'AnalysisTitle').textContent = `Análise da Faixa Mais Forte Em ${capitalize(data.nome)}`;
+
+                const blockquote = section.querySelector('blockquote');
+                blockquote.querySelector('p').textContent = `"${analise.citacao}"`;
+                blockquote.className = `border-l-4 border-${color}-400 pl-4 py-2 my-3 bg-gray-950/50 rounded`;
+                
+                section.querySelector('#top' + rank + 'Explanation').textContent = analise.explicacao;
+            }
+        }
+
+        async function loadEmotionData() {
+            try {
+                const response = await fetch(API_PERFIL_MUSICAL_URL, { method: 'GET', credentials: 'include' });
+
+                if (response.status === 401) {
+                    window.location.href = HOME_URL; 
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                populateTopSentimentCard('top1SentimentCard', 'top1DetailedAnalysis', data.top1_sentimento, 1);
+                populateTopSentimentCard('top2SentimentCard', 'top2DetailedAnalysis', data.top2_sentimento, 2);
+                
+                if (document.getElementById('emotionProfileText')) {
+                    document.getElementById('emotionProfileText').textContent = data.texto_perfil_emocional;
+                }
+
+                // Esconde o overlay após carregar tudo
+                setTimeout(hideLoading, 1000); // delay suave para UX
+
+            } catch(e) {
+                console.error("Erro:", e);
+                document.getElementById('emotionProfileText').textContent = 'Erro ao carregar dados.';
+                hideLoading();
+            }
+        }
+
+        document.getElementById("logoutButton").addEventListener("click", async () => {
+            try {
+                await fetch(`${endereco_em_uso}/api/v1/user/logout`, { method: 'POST', credentials: 'include' });
+                window.location.href = HOME_URL;
+            } catch(e) { window.location.href = HOME_URL; }
+        });
+
+        document.addEventListener("DOMContentLoaded", loadEmotionData);
+    </script>
+</body>
+</html>

@@ -11,6 +11,13 @@ from app.core.database import get_session
 from app.core.database import async_engine
 from app.api.user import valida_credenciais
 import asyncio
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DEFAULT_ADDRESS  = os.getenv("DEFAULT_ADDRESS")
+
 
 
 auth_router = APIRouter(
@@ -59,7 +66,7 @@ async def spotify_callback(
 
     # Passo 5: Resposta imediata ao navegador
     response = RedirectResponse(
-        "http://3.144.108.219:8000/static/dashboard.html",
+        f"{DEFAULT_ADDRESS}/static/dashboard.html",
         status_code=status.HTTP_302_FOUND
     )
 

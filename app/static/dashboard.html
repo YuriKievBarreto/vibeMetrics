@@ -115,7 +115,11 @@
 
   </div> <!-- fim do layout flex -->
 
-  <script>
+  <script type="module">
+      import {endereco_em_uso} from "/static/utils.js"
+
+
+
     // Gráfico vazio (será preenchido depois)
     const ctx2 = document.getElementById('genreChart').getContext('2d');
     const genreChart = new Chart(ctx2, {
@@ -136,8 +140,8 @@
 
     // Logout
     const logoutButton = document.getElementById("logoutButton");
-    const logoutUrl = "http://3.144.108.219:8000/api/v1/user/logout";
-    const redirectUrl = "http://3.144.108.219:8000/";
+    const logoutUrl = `${endereco_em_uso}/api/v1/user/logout`;
+    const redirectUrl = endereco_em_uso;
 
     async function handleLogout() {
       try {
@@ -159,7 +163,7 @@
 
     // ================== CARREGAR DADOS DO USUÁRIO ==================
     (async () => {
-      const url = "http://3.144.108.219:8000/api/v1/user/get_user_basic_data";
+      const url = `${endereco_em_uso}/api/v1/user/get_user_basic_data`;
 
       const loading = document.getElementById("loadingOverlay");
       loading.classList.remove("hidden"); // mostra loading

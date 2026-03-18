@@ -1,0 +1,44 @@
+[
+ {
+  "emocoes": "{\"alegria\": 0.05, \"otimismo\": 0.05, \"esperanca\": 0.05, \"paz\": 0.02, \"amor\": 0.02, \"tristeza\": 0.1, \"raiva\": 0.15, \"medo\": 0.1, \"nostalgia\": 0.05, \"melancolia\": 0.1, \"desilusao_amorosa\": 0.05, \"desespero\": 0.05, \"rebeldia\": 0.2, \"anseio\": 0.05, \"empoderamento\": 0.1}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.6, \"otimismo\": 0.55, \"esperanca\": 0.5, \"paz\": 0.8, \"amor\": 0.7, \"tristeza\": 0.05, \"raiva\": 0.02, \"medo\": 0.03, \"nostalgia\": 0.05, \"melancolia\": 0.05, \"desilusao_amorosa\": 0.02, \"desespero\": 0.01, \"rebeldia\": 0.05, \"anseio\": 0.4, \"empoderamento\": 0.5}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.2, \"otimismo\": 0.25, \"esperanca\": 0.15, \"paz\": 0.1, \"amor\": 0.05, \"tristeza\": 0.05, \"raiva\": 0.1, \"medo\": 0.02, \"nostalgia\": 0.05, \"melancolia\": 0.03, \"desilusao_amorosa\": 0.02, \"desespero\": 0.01, \"rebeldia\": 0.3, \"anseio\": 0.15, \"empoderamento\": 0.4}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.01, \"otimismo\": 0.01, \"esperanca\": 0.02, \"paz\": 0.01, \"amor\": 0.01, \"tristeza\": 0.65, \"raiva\": 0.2, \"medo\": 0.05, \"nostalgia\": 0.05, \"melancolia\": 0.1, \"desilusao_amorosa\": 0.05, \"desespero\": 0.1, \"rebeldia\": 0.1, \"anseio\": 0.02, \"empoderamento\": 0.05}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.2, \"otimismo\": 0.15, \"esperanca\": 0.1, \"paz\": 0.05, \"amor\": 0.3, \"tristeza\": 0.1, \"raiva\": 0.05, \"medo\": 0.05, \"nostalgia\": 0.05, \"melancolia\": 0.05, \"desilusao_amorosa\": 0.1, \"desespero\": 0.05, \"rebeldia\": 0.05, \"anseio\": 0.1, \"empoderamento\": 0.1}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.3, \"otimismo\": 0.35, \"esperanca\": 0.4, \"paz\": 0.45, \"amor\": 0.1, \"tristeza\": 0.15, \"raiva\": 0.05, \"medo\": 0.05, \"nostalgia\": 0.2, \"melancolia\": 0.1, \"desilusao_amorosa\": 0.05, \"desespero\": 0.02, \"rebeldia\": 0.1, \"anseio\": 0.25, \"empoderamento\": 0.4}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.1, \"otimismo\": 0.15, \"esperanca\": 0.1, \"paz\": 0.05, \"amor\": 0.2, \"tristeza\": 0.05, \"raiva\": 0.05, \"medo\": 0.05, \"nostalgia\": 0.1, \"melancolia\": 0.05, \"desilusao_amorosa\": 0.02, \"desespero\": 0.02, \"rebeldia\": 0.2, \"anseio\": 0.15, \"empoderamento\": 0.25}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.6, \"otimismo\": 0.55, \"esperanca\": 0.5, \"paz\": 0.45, \"amor\": 0.3, \"tristeza\": 0.05, \"raiva\": 0.02, \"medo\": 0.02, \"nostalgia\": 0.05, \"melancolia\": 0.03, \"desilusao_amorosa\": 0.02, \"desespero\": 0.01, \"rebeldia\": 0.01, \"anseio\": 0.2, \"empoderamento\": 0.4}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.05, \"otimismo\": 0.1, \"esperanca\": 0.05, \"paz\": 0.02, \"amor\": 0.02, \"tristeza\": 0.03, \"raiva\": 0.2, \"medo\": 0.05, \"nostalgia\": 0.02, \"melancolia\": 0.05, \"desilusao_amorosa\": 0.02, \"desespero\": 0.02, \"rebeldia\": 0.3, \"anseio\": 0.1, \"empoderamento\": 0.25}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.2, \"otimismo\": 0.25, \"esperanca\": 0.15, \"paz\": 0.3, \"amor\": 0.1, \"tristeza\": 0.05, \"raiva\": 0.05, \"medo\": 0.02, \"nostalgia\": 0.05, \"melancolia\": 0.03, \"desilusao_amorosa\": 0.02, \"desespero\": 0.01, \"rebeldia\": 0.3, \"anseio\": 0.15, \"empoderamento\": 0.4}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.2, \"otimismo\": 0.25, \"esperanca\": 0.15, \"paz\": 0.1, \"amor\": 0.05, \"tristeza\": 0.15, \"raiva\": 0.1, \"medo\": 0.1, \"nostalgia\": 0.05, \"melancolia\": 0.1, \"desilusao_amorosa\": 0.05, \"desespero\": 0.05, \"rebeldia\": 0.25, \"anseio\": 0.15, \"empoderamento\": 0.3}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.1, \"otimismo\": 0.15, \"esperanca\": 0.1, \"paz\": 0.05, \"amor\": 0.05, \"tristeza\": 0.05, \"raiva\": 0.2, \"medo\": 0.02, \"nostalgia\": 0.15, \"melancolia\": 0.1, \"desilusao_amorosa\": 0.02, \"desespero\": 0.02, \"rebeldia\": 0.3, \"anseio\": 0.15, \"empoderamento\": 0.25}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.1, \"otimismo\": 0.05, \"esperanca\": 0.05, \"paz\": 0.02, \"amor\": 0.02, \"tristeza\": 0.02, \"raiva\": 0.25, \"medo\": 0.05, \"nostalgia\": 0.02, \"melancolia\": 0.02, \"desilusao_amorosa\": 0.02, \"desespero\": 0.01, \"rebeldia\": 0.3, \"anseio\": 0.05, \"empoderamento\": 0.2}"
+ },
+ {
+  "emocoes": "{\"alegria\": 0.1, \"otimismo\": 0.2, \"esperanca\": 0.25, \"paz\": 0.05, \"amor\": 0.1, \"tristeza\": 0.15, \"raiva\": 0.05, \"medo\": 0.3, \"nostalgia\": 0.1, \"melancolia\": 0.1, \"desilusao_amorosa\": 0.05, \"desespero\": 0.05, \"rebeldia\": 0.2, \"anseio\": 0.25, \"empoderamento\": 0.35}"
+ }
+]

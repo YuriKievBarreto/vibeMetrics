@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suas Músicas - Vibe Metrics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg">
+</head>
+
+<body class="bg-gray-950 text-white h-screen flex flex-col md:flex-row">
+
+    <header class="w-full bg-gray-900 px-6 py-4 flex items-center justify-between border-b border-gray-800 md:hidden">
+    <div class="flex items-center gap-2">
+      <img 
+        src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" 
+        alt="logo" 
+        class="w-6 h-6"
+      >
+      <h1 class="text-xl font-semibold">Spotify Analytics</h1>
+    </div>
+
+    <button id="mobileMenu" class="text-white text-2xl">☰</button>
+  </header>
+
+  <aside class="w-64 bg-gray-900 flex flex-col p-6 border-r border-gray-800 hidden md:flex shrink-0">
+    <div class="flex items-center gap-2 mb-10 cursor-pointer" onclick="window.location.href='/'">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="logo" class="w-6 h-6">
+      <h1 class="text-xl font-semibold">Vibe Metrics - Spotify</h1>
+    </div>
+
+    <nav class="flex flex-col gap-4">
+      <a href="/static/dashboard.html" class="text-gray-300 hover:text-green-500 transition">🎧 Visão Geral</a>
+      <a href="/static/artistas.html" class="text-gray-300 hover:text-green-500 transition">👥 Artistas</a>
+      <a href="/static/musicas.html" class="text-green-500 font-bold transition border-l-4 border-green-500 pl-2">🎵 Músicas</a>
+      <a href="/static/emocoes.html" class="text-gray-300 font-bold transition  ">🧠 Emoções IA</a>
+    </nav>
+
+    <div class="mt-auto">
+      <button id="logoutButton" class="w-full bg-green-500 hover:bg-green-600 text-black font-semibold py-2 rounded-full mt-10 transition">Sair</button>
+    </div>
+  </aside>
+
+  <main class="flex-1 overflow-y-auto p-6 md:p-10">
+    
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div>
+        <h2 class="text-2xl md:text-3xl font-bold mb-1">Top Músicas 🎵</h2>
+        <p class="text-gray-400 text-sm md:text-base">O que você não para de ouvir.</p>
+      </div>
+      
+      <div id="timeFilters" class="flex bg-gray-800 rounded-lg p-1 self-start md:self-auto shadow-sm">
+        <button class="time-btn px-3 py-1 md:px-4 rounded font-medium text-xs md:text-sm transition cursor-pointer bg-green-500 text-black shadow">4 Semanas</button>
+        <button class="time-btn px-3 py-1 md:px-4 rounded font-medium text-xs md:text-sm transition cursor-pointer text-gray-400 hover:text-white">6 Meses</button>
+        <button class="time-btn px-3 py-1 md:px-4 rounded font-medium text-xs md:text-sm transition cursor-pointer text-gray-400 hover:text-white">Tudo</button>
+      </div>
+    </header>
+
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      
+      <div class="bg-gray-900 p-4 rounded-xl border border-gray-800">
+    <p class="text-gray-400 text-xs uppercase font-bold">Sentimento Predominante</p>
+    <p id="vibeDominanteText" class="text-xl font-bold text-green-400 mt-1">Carregando...</p> 
+</div>
+
+      <div class="bg-gray-900 p-4 rounded-xl border border-gray-800">
+    <p class="text-gray-400 text-xs uppercase font-bold">Duração Média</p>
+    <p id="avgDurationValue" class="text-xl font-bold text-white mt-1">3:35 <span class="text-lg text-gray-500">min</span></p>
+</div>
+
+      <div class="bg-gray-900 p-4 rounded-xl border border-gray-800">
+        <p class="text-gray-400 text-xs uppercase font-bold">Intensidade do sentimento </p>
+        <p class="text-xl font-bold text-blue-400 mt-1">😊 Positivo</p>
+      </div>
+
+      <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 flex flex-col justify-center">
+        
+        <div class="flex justify-between items-center mb-2">
+    <p class="text-gray-400 text-xs uppercase font-bold">Popularidade Média</p>
+    <span id="avgPopularityBadge" class="px-2 py-0.5 bg-gray-800 border border-gray-700 rounded text-xs text-yellow-500 font-bold">
+      🔥 65
+    </span>
+</div>
+
+        <div class="w-full bg-gray-700 h-2 rounded-full">
+          <div class="bg-yellow-500 h-2 rounded-full shadow-[0_0_10px_rgba(234,179,8,0.5)]" style="width: 65%"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="bg-gray-900 rounded-2xl border border-gray-800 overflow-hidden">
+      
+      <div class="grid grid-cols-12 gap-4 p-4 border-b border-gray-800 text-gray-400 text-xs uppercase font-bold items-center">
+        <div class="col-span-1 text-center">#</div>
+        <div class="col-span-11 md:col-span-5">Título</div> 
+        <div class="hidden md:block md:col-span-3">Álbum</div>
+        <div class="hidden md:block md:col-span-2 text-center">Análise (IA)</div>
+        <div class="hidden md:block md:col-span-1 text-center">Duração</div>
+      </div>
+
+     <div id="tracksContainer">
+        
+        <div class="grid grid-cols-12 gap-4 p-4 hover:bg-gray-800 transition items-center border-b border-gray-800 last:border-0 group">
+          <div class="col-span-1 text-center text-green-500 font-bold">1</div>
+          
+          <div class="col-span-11 md:col-span-5 flex items-start gap-3">
+            <img src="https://placehold.co/300x300/22c55e/black?text=1" class="w-10 h-10 rounded shadow shrink-0 object-cover">
+            
+            <div class="overflow-hidden flex-1 min-w-0">
+              
+              <div class="flex justify-between md:justify-start items-center mb-0.5 md:gap-3">
+                
+                <h4 class="text-white font-semibold truncate group-hover:text-green-400 transition text-sm md:text-base">
+                  Nome da Música Top
+                </h4>
+
+                <span class="shrink-0 flex items-center gap-1 px-1.5 py-0.5 bg-gray-800 border border-gray-700 rounded text-[10px] text-yellow-500 font-bold" title="Popularidade: 92">
+                  🔥 92
+                </span>
+              </div>
+
+              <p class="text-gray-400 text-xs truncate">Nome do Artista</p>
+              
+              <div class="flex flex-wrap items-center gap-2 mt-2 md:hidden">
+                <span class="inline-block px-2 py-0.5 bg-blue-900 text-blue-200 text-[10px] rounded w-fit shadow-sm">Melancolia</span>
+                <div class="flex items-center gap-1" title="Nível de Energia">
+                  <span class="text-[10px] text-gray-500">Energy:</span>
+                  <div class="w-12 bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-green-500 h-full rounded-full" style="width: 80%"></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="hidden md:block md:col-span-3 text-gray-400 text-sm truncate">
+            Nome do Álbum Incrível
+          </div>
+
+          <div class="hidden md:flex md:col-span-2 flex-col justify-center items-center gap-1">
+            <span class="inline-block px-2 py-0.5 bg-blue-900 text-blue-200 text-[10px] rounded w-fit shadow-sm">Melancolia</span>
+            <div class="flex items-center gap-1" title="Nível de Energia">
+               <span class="text-[10px] text-gray-500 w-8 text-right">Energy:</span>
+               <div class="w-16 bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                 <div class="bg-green-500 h-full rounded-full" style="width: 80%"></div>
+               </div>
+            </div>
+          </div>
+
+          <div class="hidden md:block md:col-span-1 text-center text-gray-400 text-sm font-mono">
+            3:45
+          </div>
+        </div>
+
+        <div class="grid grid-cols-12 gap-4 p-4 hover:bg-gray-800 transition items-center border-b border-gray-800 last:border-0 group">
+          <div class="col-span-1 text-center font-bold text-gray-500">2</div>
+          
+          <div class="col-span-11 md:col-span-5 flex items-start gap-3">
+            <img src="https://placehold.co/300x300/3b82f6/black?text=2" class="w-10 h-10 rounded shadow shrink-0 object-cover">
+            
+            <div class="overflow-hidden flex-1 min-w-0">
+              
+              <div class="flex justify-between md:justify-start items-center mb-0.5 md:gap-3">
+                <h4 class="text-white font-semibold truncate group-hover:text-green-400 transition text-sm md:text-base">
+                  Outra Música Legal
+                </h4>
+                <span class="shrink-0 flex items-center gap-1 px-1.5 py-0.5 bg-gray-800 border border-gray-700 rounded text-[10px] text-gray-400 font-bold" title="Popularidade: 45">
+                  🔥 45
+                </span>
+              </div>
+
+              <p class="text-gray-400 text-xs truncate">Banda Famosa</p>
+
+              <div class="flex flex-wrap items-center gap-2 mt-2 md:hidden">
+                <span class="inline-block px-2 py-0.5 bg-yellow-900 text-yellow-200 text-[10px] rounded w-fit shadow-sm">Alegria</span>
+                <div class="flex items-center gap-1" title="Nível de Energia">
+                   <span class="text-[10px] text-gray-500">Energy:</span>
+                   <div class="w-12 bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                     <div class="bg-yellow-500 h-full rounded-full" style="width: 95%"></div>
+                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hidden md:block md:col-span-3 text-gray-400 text-sm truncate">
+            Greatest Hits Vol 2
+          </div>
+
+          <div class="hidden md:flex md:col-span-2 flex-col justify-center items-center gap-1">
+            <span class="inline-block px-2 py-0.5 bg-yellow-900 text-yellow-200 text-[10px] rounded w-fit shadow-sm">Alegria</span>
+            <div class="flex items-center gap-1" title="Nível de Energia">
+               <span class="text-[10px] text-gray-500 w-8 text-right">Energy:</span>
+               <div class="w-16 bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                 <div class="bg-yellow-500 h-full rounded-full" style="width: 95%"></div>
+               </div>
+            </div>
+          </div>
+
+          <div class="hidden md:block md:col-span-1 text-center text-gray-400 text-sm font-mono">
+            2:30
+          </div>
+        </div>
+        
+      </div>
+    </section>
+
+  </main>
+
+ <script type="module">
+  import {endereco_em_uso} from "/static/utils.js"
+  
+    // ============================================================
+    // CONFIGURAÇÃO E VARIÁVEIS GLOBAIS
+    // ============================================================
+    const API_TRACKS_URL = `${endereco_em_uso}/api/v1/user/top-musicas`; 
+    const LOGOUT_URL = `${endereco_em_uso}/api/v1/user/logout`;
+    const HOME_URL = "/";
+    
+    // Variáveis de Estado
+    let allTracksData = []; 
+    const rankMap = ['short_rank', 'medium_rank', 'long_rank'];
+
+    // Seletores DOM
+    const tracksContainer = document.getElementById("tracksContainer");
+    const logoutButton = document.getElementById("logoutButton");
+    const filterButtons = document.querySelectorAll('.time-btn');
+
+    // Mapeamento de Cores para Emoções (ajuste este dicionário se adicionar mais cores)
+    const emotionColors = {
+    'alegria': { bg: 'bg-yellow-900', text: 'text-yellow-200', bar: 'bg-yellow-500' },
+    'otimismo': { bg: 'bg-yellow-800', text: 'text-yellow-100', bar: 'bg-yellow-400' },
+    'esperanca': { bg: 'bg-green-800', text: 'text-green-100', bar: 'bg-green-500' },
+    'introspeccao': { bg: 'bg-indigo-900', text: 'text-indigo-100', bar: 'bg-indigo-500' },
+    'paz': { bg: 'bg-green-900', text: 'text-green-100', bar: 'bg-green-400' },
+    'amor': { bg: 'bg-pink-700', text: 'text-pink-100', bar: 'bg-pink-500' },
+    'tristeza': { bg: 'bg-blue-900', text: 'text-blue-200', bar: 'bg-blue-500' },
+    'melancolia': { bg: 'bg-blue-800', text: 'text-blue-100', bar: 'bg-blue-400' },
+    'nostalgia': { bg: 'bg-amber-900', text: 'text-amber-100', bar: 'bg-amber-500' },
+    'raiva': { bg: 'bg-red-900', text: 'text-red-200', bar: 'bg-red-500' },
+    'desilusao_amorosa': { bg: 'bg-rose-900', text: 'text-rose-100', bar: 'bg-rose-500' },
+    'desespero': { bg: 'bg-red-950', text: 'text-red-200', bar: 'bg-red-600' },
+    'rebeldia': { bg: 'bg-red-700', text: 'text-red-100', bar: 'bg-red-400' },
+    'medo': { bg: 'bg-purple-950', text: 'text-purple-200', bar: 'bg-purple-600' },
+    'anseio': { bg: 'bg-orange-900', text: 'text-orange-200', bar: 'bg-orange-500' },
+    'autoafirmacao': { bg: 'bg-lime-900', text: 'text-lime-200', bar: 'bg-lime-500' },
+    'sensualidade': { bg: 'bg-fuchsia-900', text: 'text-fuchsia-200', bar: 'bg-fuchsia-500' },
+    'sexual_explicit': { bg: 'bg-fuchsia-950', text: 'text-fuchsia-200', bar: 'bg-fuchsia-600' },
+
+    // fallback
+    'default': { bg: 'bg-gray-700', text: 'text-gray-200', bar: 'bg-gray-500' }
+};
+
+    
+    // Mapeamento para o Card Vibe Predominante
+    const VIBE_DISPLAY_MAP = {
+    'alegria': '😄 ALEGRIA',
+    'otimismo': '✨ OTIMISMO',
+    'esperanca': '🌈 ESPERANÇA',
+    'introspeccao': '🤔 INTROSPECÇÃO',
+    'paz': '🧘 CALMARIA',
+    'amor': '❤️ AMOR',
+    'tristeza': '😔 TRISTEZA',
+    'raiva': '😡 RAIVA',
+    'medo': '😨 MEDO',
+    'nostalgia': '📼 NOSTALGIA',
+    'melancolia': '🌧️ MELANCOLIA',
+    'desilusao_amorosa': '💔 DESILUSÃO AMOROSA',
+    'desespero': '🚨 DESESPERO',
+    'rebeldia': '🤘 REBELDIA',
+    'anseio': '🔥 ANSEIO',
+    'autoafirmacao': '💪 AUTOAFIRMAÇÃO',
+    'sensualidade': '💋 SENSUALIDADE',
+    'sexual_explicit': '🔞 PROIBIDÃO'
+};
+
+    
+    const activeClasses = ['bg-green-500', 'text-black', 'shadow'];
+    const inactiveClasses = ['text-gray-400', 'hover:text-white'];
+
+
+    // ============================================================
+    // FUNÇÕES DE UTILIDADE E CÁLCULO
+    // ============================================================
+    
+    function formatDuration(ms) {
+        if (!ms) return "--:--";
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // Encontra a emoção com maior valor no dicionário "emocoes"
+    function getDominantEmotionData(emotionsObj) {
+        if (!emotionsObj) return { name: 'Desconhecido', score: 0, style: emotionColors['default'] };
+
+        let maxEmotion = 'neutro';
+        let maxScore = -1;
+
+        for (const [emotion, score] of Object.entries(emotionsObj)) {
+            if (score > maxScore) {
+                maxScore = score;
+                maxEmotion = emotion;
+            }
+        }
+        
+        const style = emotionColors[maxEmotion] || emotionColors['default'];
+        
+        return {
+            name: maxEmotion.charAt(0).toUpperCase() + maxEmotion.slice(1),
+            score: maxScore,
+            style: style
+        };
+    }
+
+    // ============================================================
+    // RENDERIZAÇÃO DE UMA LINHA
+    // ============================================================
+
+    function createTrackRowHTML(track, rankNumber) {
+        // Assume que a duração já está formatada pelo backend ou faz aqui:
+        const duration = formatDuration(track.duracao_ms); 
+        const popularity = track.popularidade || 0;
+        const emotionData = getDominantEmotionData(track.emocoes);
+        
+        // Intensidade visual: score (0.0 a 1.0) -> 0% a 100%
+        const intensityPercent = Math.round(emotionData.score * 100);
+
+        const popularityBadge = `
+            <span class="shrink-0 flex items-center gap-1 px-1.5 py-0.5 bg-gray-800 border border-gray-700 rounded text-[10px] text-yellow-500 font-bold" title="Popularidade: ${popularity}">
+                🔥 ${popularity}
+            </span>
+        `;
+
+        const analysisBlock = `
+            <span class="inline-block px-2 py-0.5 ${emotionData.style.bg} ${emotionData.style.text} text-[10px] rounded w-fit shadow-sm uppercase font-bold tracking-wide">
+                ${emotionData.name}
+            </span>
+            <div class="flex items-center gap-1 mt-1" title="Intensidade da Emoção: ${intensityPercent}%">
+               <span class="text-[10px] text-gray-500 w-8 text-right">Intens.:</span>
+               <div class="w-16 bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                 <div class="${emotionData.style.bar} h-full rounded-full" style="width: ${intensityPercent}%"></div>
+               </div>
+            </div>
+        `;
+        
+        // ⚠️ Usando fallbacks para imagem e artista, que não vieram no JSON fornecido
+        const imageSrc = track.link_imagem || 'https://placehold.co/100x100/1f2937/white?text=Music';
+        const artistName = track.artista_principal || 'Artista Desconhecido';
+
+        return `
+        <div class="grid grid-cols-12 gap-4 p-4 hover:bg-gray-800 transition items-center border-b border-gray-800 last:border-0 group animate-fade-in">
+          <div class="col-span-1 text-center text-green-500 font-bold text-sm md:text-base">${rankNumber}</div>
+          
+          <div class="col-span-11 md:col-span-5 flex items-start gap-3">
+            <img src="${imageSrc}" alt="${track.nome_faixa}" class="w-12 h-12 rounded-md shadow-lg shrink-0 object-cover bg-gray-800">
+            
+            <div class="overflow-hidden flex-1 min-w-0">
+              
+              <div class="flex justify-between md:justify-start items-center mb-0.5 md:gap-3">
+                <h4 class="text-white font-semibold truncate group-hover:text-green-400 transition text-sm md:text-base pr-2" title="${track.nome_faixa}">
+                  ${track.nome_faixa}
+                </h4>
+                ${popularityBadge}
+              </div>
+
+              <p class="text-gray-400 text-xs truncate cursor-default" title="${artistName}">${artistName}</p>
+              
+              <div class="flex flex-col gap-1 mt-2 md:hidden">
+                ${analysisBlock}
+              </div>
+
+            </div>
+          </div>
+
+          <div class="hidden md:block md:col-span-3 text-gray-400 text-sm truncate" title="${track.album}">
+            ${track.album || 'N/A'}
+          </div>
+
+          <div class="hidden md:flex md:col-span-2 flex-col justify-center items-center gap-1">
+            ${analysisBlock}
+          </div>
+
+          <div class="hidden md:block md:col-span-1 text-center text-gray-400 text-sm font-mono">
+            ${duration}
+          </div>
+        </div>
+        `;
+    }
+
+    // ============================================================
+    // LÓGICA DE FILTRAGEM E EXIBIÇÃO
+    // ============================================================
+    function renderFilteredTracks(rankKey) {
+        tracksContainer.innerHTML = "";
+        
+        // 1. Filtra: Pega apenas as músicas que tem rank nesse período (não nulos)
+        const filteredTracks = allTracksData.filter(track => track[rankKey] !== null);
+
+        // 2. Ordena: Garante que o rank 1 apareça primeiro, depois o 2, etc.
+        filteredTracks.sort((a, b) => a[rankKey] - b[rankKey]);
+
+        if (filteredTracks.length === 0) {
+            tracksContainer.innerHTML = '<div class="p-10 text-center text-gray-500">Nenhuma música encontrada neste período.</div>';
+            return;
+        }
+
+        // 3. Renderiza
+        filteredTracks.forEach(track => {
+            // Passamos o rankKey para pegar o rank específico do período
+            const rankNumber = track[rankKey]; 
+            tracksContainer.innerHTML += createTrackRowHTML(track, rankNumber);
+        });
+    }
+
+    // ============================================================
+    // CARREGAMENTO INICIAL
+    // ============================================================
+    async function loadTracks() {
+        tracksContainer.innerHTML = '<div class="p-10 text-center text-gray-500 flex flex-col items-center gap-2"><div class="w-6 h-6 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>Buscando dados no Spotify...</div>';
+
+        try {
+          
+            const response = await fetch(API_TRACKS_URL, { method: 'GET', credentials: 'include' });
+
+            if (response.status === 401) {
+                tracksContainer.innerHTML = '<div class="p-10 text-center text-red-400">Sessão expirada. <a href="/api/v1/auth/login" class="underline hover:text-white">Clique para logar</a></div>';
+                return;
+            }
+            if (!response.ok) throw new Error("Falha ao buscar dados");
+
+            const data = await response.json();
+            
+            
+            
+            // --- 1. Atualiza Cards do Topo (Métricas) ---
+            
+            // Vibe Predominante
+            const rawVibe = data.sentimento_predominante.toLowerCase();
+            const vibeText = VIBE_DISPLAY_MAP[rawVibe] || VIBE_DISPLAY_MAP.default;
+            const vibeElement = document.getElementById('vibeDominanteText');
+            if(vibeElement) vibeElement.textContent = vibeText; 
+
+            // Duração Média
+            const durationElement = document.querySelector('#avgDurationValue');
+            if(durationElement) durationElement.innerHTML = `${formatDuration(data.duracao_media_ms)} <span class="text-sm text-gray-500"></span>`;
+
+            // Sentimento IA (Usando pontuação)
+            const score = data.pontuacao_sentimento_predominante || 0;
+            const sentimentElement = document.querySelector('.bg-gray-900:nth-child(3) .text-xl');
+            if(sentimentElement) {
+                let sentimentEmoji = score > 0.7 ? '🤩' : (score > 0.4 ? '🙂' : '😐');
+                sentimentElement.textContent = ` ${Math.round(score * 100)}% ${VIBE_DISPLAY_MAP[rawVibe]}`;
+                sentimentElement.className = "text-xl font-bold mt-1 " + (score > 0.5 ? "text-blue-400" : "text-gray-400");
+            }
+            
+            // Popularidade Média
+           const avgPop = Math.round(data.popularidade_media || 0);
+
+           const popBadge = document.getElementById('avgPopularityBadge');
+           const popBarFill = document.getElementById('avgPopularityBarFill'); // Pega o elemento da barra
+
+           if (popBadge) {
+              popBadge.innerText = `🔥 ${avgPop}`; // ⭐️ Injeta o valor no badge
+           }
+
+           if (popBarFill) {
+              popBarFill.style.width = `${avgPop}%`; // ⭐️ Atualiza o preenchimento da barra
+           }
+
+
+            // --- 2. SALVA DADOS E RENDERIZA A VISÃO PADRÃO ---
+            allTracksData = data.faixas || [];
+            renderFilteredTracks('short_rank'); // Padrão: 4 semanas
+
+        } catch (error) {
+            console.error("Erro de carregamento:", error);
+            tracksContainer.innerHTML = '<div class="p-10 text-center text-red-500">Falha ao carregar dados. Verifique a conexão com a API.</div>';
+        }
+    }
+
+    // ============================================================
+    // EVENT LISTENERS
+    // ============================================================
+    
+    // Logout Logic
+    if (logoutButton) {
+        logoutButton.addEventListener("click", async () => {
+            try { await fetch(LOGOUT_URL, { method: 'POST', credentials: 'include' }); } 
+            catch(e) {}
+            window.location.href = HOME_URL;
+        });
+    }
+
+    // Filtros de Tempo (Lógica de Troca de Dados)
+    filterButtons.forEach((button, index) => {
+        button.addEventListener('click', () => {
+            // 1. Atualiza Visual dos Botões
+            filterButtons.forEach(btn => {
+                btn.classList.remove(...activeClasses);
+                btn.classList.add(...inactiveClasses);
+            });
+            button.classList.remove(...inactiveClasses);
+            button.classList.add(...activeClasses);
+
+            // 2. Mapeia a chave de rank (0 -> short_rank, 1 -> medium_rank, 2 -> long_rank)
+            const selectedRankKey = rankMap[index];
+            
+            // 3. Atualiza a lista
+            renderFilteredTracks(selectedRankKey);
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", loadTracks);
+  </script>
+
+</body>
+</html>

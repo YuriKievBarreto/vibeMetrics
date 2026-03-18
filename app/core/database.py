@@ -7,7 +7,7 @@ class Base(DeclarativeBase):
     pass
 
 
-rodando_em_conteiner = True
+rodando_em_conteiner = False
 
 if rodando_em_conteiner:
     DATABASE_URL = "postgresql+asyncpg://yuri:yuri@db_spotify_analytics:5432/db_spotify_analytics"

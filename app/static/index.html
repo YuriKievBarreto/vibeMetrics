@@ -73,9 +73,13 @@
     © 2025 Vibe Metrics —  por Yuri
   </footer>
 
-  <script> document.addEventListener("click", (e) => {
+ <script type="module">
+  import {endereco_em_uso} from "/static/utils.js"
+  
+  
+  document.addEventListener("click", (e) => {
   if (e.target.id === "btn-entrar") {
-    fetch('http://3.144.108.219:8000/api/v1/user/me', {
+    fetch(`${endereco_em_uso}/api/v1/user/me`, {
     method: 'GET',
     credentials: 'include' 
 })
@@ -83,12 +87,12 @@
     if (response.status === 401) {
         console.error("Autenticação falhou! Redirecionar para login.");
        
-       window.location.href = "http://3.144.108.219:8000/api/v1/auth/login";
+       window.location.href = `${endereco_em_uso}/api/v1/auth/login`;
 
     } else {
         console.log("session token encontrado, login efetuado")
         console.log("redirecionando para dashboard")
-        window.location.href = 'http://3.144.108.219:8000/static/dashboard.html'
+        window.location.href = `${endereco_em_uso}/static/dashboard.html`
 
     }
 })
