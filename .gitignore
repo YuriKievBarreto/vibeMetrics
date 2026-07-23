@@ -21,10 +21,10 @@ venv/
 *.sqlite3
 log/
 .sqlitedata
-
+.cache
 
 .env
-
+*.cache
 
 /dist
 /build
