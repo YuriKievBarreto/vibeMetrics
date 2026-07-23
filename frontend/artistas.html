@@ -30,10 +30,10 @@
     </div>
 
     <nav class="flex flex-col gap-4">
-      <a href="/static/dashboard.html" class="text-gray-300 hover:text-green-500 transition">🎧 Visão Geral</a>
-      <a href="/static/artists.html" class="text-green-500 font-bold transition border-l-4 border-green-500 pl-2">👥 Artistas</a>
-      <a href="/static/musicas.html" class="text-gray-300 hover:text-green-500 transition">🎵 Músicas</a>
-      <a href="/static/emocoes.html" class="text-grey-300 hover:text-green-500 transition ">🧠 Emoções IA</a>
+      <a href="/dashboard.html" class="text-gray-300 hover:text-green-500 transition">🎧 Visão Geral</a>
+      <a href="/artists.html" class="text-green-500 font-bold transition border-l-4 border-green-500 pl-2">👥 Artistas</a>
+      <a href="/musicas.html" class="text-gray-300 hover:text-green-500 transition">🎵 Músicas</a>
+      <a href="/emocoes.html" class="text-grey-300 hover:text-green-500 transition ">🧠 Emoções IA</a>
     </nav>
 
     <div class="mt-auto">
@@ -126,15 +126,15 @@
   </main>
 
  <script type="module">
-  import {endereco_em_uso} from "static/utils.js"
+  import {endereco_api_em_uso} from "./utils.js"
     // ============================================================
     // CONFIGURAÇÃO E VARIÁVEIS GLOBAIS
     // ============================================================
     
    
 
-    const API_ARTISTS_URL = `${endereco_em_uso}/api/v1/user/top-artistas`;
-    const LOGOUT_URL = `${endereco_em_uso}/api/v1/user/logout`;
+    const API_ARTISTS_URL = `${endereco_api_em_uso}/api/v1/user/top-artistas`;
+    const LOGOUT_URL = `${endereco_api_em_uso}/api/v1/user/logout`;
     const HOME_URL = "/";
     
     // Variável global para armazenar os dados crus do Backend

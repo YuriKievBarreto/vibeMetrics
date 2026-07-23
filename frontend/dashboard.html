@@ -116,7 +116,7 @@
   </div> <!-- fim do layout flex -->
 
   <script type="module">
-      import {endereco_em_uso} from "/static/utils.js"
+      import {endereco_api_em_uso} from "./utils.js"
 
 
 
@@ -140,8 +140,8 @@
 
     // Logout
     const logoutButton = document.getElementById("logoutButton");
-    const logoutUrl = `${endereco_em_uso}/api/v1/user/logout`;
-    const redirectUrl = endereco_em_uso;
+    const logoutUrl = `${endereco_api_em_uso}/api/v1/user/logout`;
+    const redirectUrl = endereco_api_em_uso;
 
     async function handleLogout() {
       try {
@@ -163,7 +163,7 @@
 
     // ================== CARREGAR DADOS DO USUÁRIO ==================
     (async () => {
-      const url = `${endereco_em_uso}/api/v1/user/get_user_basic_data`;
+      const url = `${endereco_api_em_uso}/api/v1/user/get_user_basic_data`;
 
       const loading = document.getElementById("loadingOverlay");
       loading.classList.remove("hidden"); // mostra loading

@@ -188,8 +188,8 @@
     </main>
 
     <script type="module">
-    import {endereco_em_uso} from "/static/utils.js"
-        const API_PERFIL_MUSICAL_URL = `${endereco_em_uso}/api/v1/user/perfil-musical`;
+    import {endereco_api_em_uso} from "./utils.js"
+        const API_PERFIL_MUSICAL_URL = `${endereco_api_em_uso}/api/v1/user/perfil-musical`;
         const HOME_URL = "/";
 
         const EMOTION_MAP = {
@@ -302,7 +302,7 @@
 
         document.getElementById("logoutButton").addEventListener("click", async () => {
             try {
-                await fetch(`${endereco_em_uso}/api/v1/user/logout`, { method: 'POST', credentials: 'include' });
+                await fetch(`${endereco_api_em_uso}/api/v1/user/logout`, { method: 'POST', credentials: 'include' });
                 window.location.href = HOME_URL;
             } catch(e) { window.location.href = HOME_URL; }
         });
