@@ -1,29 +1,22 @@
-from sqlalchemy import  String  , DateTime, JSON
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import List
+from typing import List, Optional
 from datetime import datetime
+from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import DateTime, JSON
 
-from app.core.database import Base
 
-
-class Usuario(Base):
+class Usuario(SQLModel, table=True):
     __tablename__ = "usuario"
 
-    id_usuario: Mapped[str] = mapped_column(String(50), primary_key=True)
-    nome_exibicao: Mapped[str] = mapped_column(String(50), nullable=False)
-    pais: Mapped[str] = mapped_column(String(50), nullable=False)
+    id_usuario: str = Field(max_length=50, primary_key=True)
+    nome_exibicao: str = Field(max_length=50)
+    pais: str = Field(max_length=50)
 
-    access_token: Mapped[str] = mapped_column(String(512), nullable=False)
-    refresh_token: Mapped[str] = mapped_column(String(1024))
-    token_expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
-    ultima_atualizacao: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
-    status_processamento: Mapped[str] = mapped_column(String(512), nullable=True)
-    perfil_emocional: Mapped[str] = mapped_column(JSON, nullable= True)
+    access_token: str = Field(max_length=512)
+    refresh_token: str = Field(max_length=1024)
+    token_expires_at: Optional[datetime] = Field(default=None, sa_type=DateTime(timezone=True))
+    ultima_atualizacao: Optional[datetime] = Field(default=None, sa_type=DateTime(timezone=True))
+    status_processamento: Optional[str] = Field(default=None, max_length=512)
+    perfil_emocional: Optional[str] = Field(default=None, sa_type=JSON)
 
-    top_artistas_rel: Mapped[List["UsuarioTopArtista"]] = relationship(
-        back_populates="usuario"
-    )
-
-    top_faixas_rel: Mapped[List["UsuarioTopFaixa"]] = relationship(
-        back_populates="usuario"
-    )
+    top_artistas_rel: List["UsuarioTopArtista"] = Relationship(back_populates="usuario")
+    top_faixas_rel: List["UsuarioTopFaixa"] = Relationship(back_populates="usuario")

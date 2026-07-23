@@ -1,23 +1,16 @@
 from sqlalchemy import  Integer, String
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import List
+from typing import List, Optional
+from sqlmodel import SQLModel, Field, Relationship
 
-from app.core.database import Base
+class Artista(SQLModel, table=True):
+    __tablename__ = "artista"
 
-class Artista(Base):
-    __tablename__ = "artista" 
-    id_artista: Mapped[str] = mapped_column(String(50), primary_key=True)
-    nome_artista: Mapped[str] = mapped_column(String(50), nullable=False)
-    popularidade_artista: Mapped[int] = mapped_column(Integer, nullable=False)
-    link_imagem: Mapped[str] = mapped_column(String(250), nullable=False)
-    generos: Mapped[List[str]] = mapped_column(postgresql.ARRAY(String))
+    id_artista: str = Field(max_length=50, primary_key=True)
+    nome_artista: str = Field(max_length=50)
+    popularidade_artista: int
+    link_imagem: str = Field(max_length=250)
+    generos: List[str] = Field(sa_type=postgresql.ARRAY(String))
 
-    top_usuarios_rel: Mapped[List["UsuarioTopArtista"]] = relationship(
-        back_populates="artista"
-    )
-
-    """
-    generos_rel: Mapped[List["GeneroArtista"]] = relationship(
-        back_populates="artista"
-    )"""
+    top_usuarios_rel: List["UsuarioTopArtista"] = Relationship(back_populates="artista")

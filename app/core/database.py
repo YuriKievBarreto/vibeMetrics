@@ -1,109 +1,71 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import text, inspect
+from sqlmodel import SQLModel
+import asyncio
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 
-class Base(DeclarativeBase):
-    pass
+DATABASE_URL = os.getenv("DATABASE_URL")
+print(DATABASE_URL)
 
 
-rodando_em_conteiner = False
-
-if rodando_em_conteiner:
-    DATABASE_URL = "postgresql+asyncpg://yuri:yuri@db_spotify_analytics:5432/db_spotify_analytics"
-else:
-    DATABASE_URL ="postgresql+asyncpg://yuri:yuri@localhost:5432/db_spotify_analytics"
-   
-    
 def get_db_structure(sync_conn):
     """Executa a inspeção do DB de forma SÍNCRONA."""
-    
-    # 1. O inspect deve ser chamado na conexão síncrona (sync_conn)
+
     inspector = inspect(sync_conn)
-    
+
     table_names = inspector.get_table_names()
     db_structure = {}
-    
+
     for table_name in table_names:
         columns = inspector.get_columns(table_name)
         column_names = [col['name'] for col in columns]
         db_structure[table_name] = column_names
-        
+
     return db_structure
-
-
 
 
 async_engine = create_async_engine(DATABASE_URL)
 
 
 async def init_db():
-    
-    from app.models.usuario import Usuario 
-    from app.models.artista import  Artista 
-    from app.models.faixa import Faixa 
-    from app.models.relacionamentos import UsuarioTopArtista, UsuarioTopFaixa
-    
+
+    import app.models.all_models
+
     try:
-         async with async_engine.begin() as conn:
+        async with async_engine.begin() as conn:
             print("iniciando tentativa de conexao com o banco de dados")
             print("apagando todas as tabelas")
-            await conn.run_sync(Base.metadata.drop_all)
+            await conn.run_sync(SQLModel.metadata.drop_all)
             print("criando todas as tabelas")
-            await conn.run_sync(Base.metadata.create_all)
+            await conn.run_sync(SQLModel.metadata.create_all)
             print("conexao bem sucedida")
 
-            
             db_structure = await conn.run_sync(get_db_structure)
-            
+
             print("\n--- ESTRUTURA ATUAL DO BANCO DE DADOS ---")
-            
-            
+
             table_count = 0
             for table_name, column_names in db_structure.items():
                 print(f"[{table_name.upper()}] ({len(column_names)} colunas):")
                 print(f"  -> Colunas: {', '.join(column_names)}")
                 table_count += 1
-                
+
             print("-----------------------------------------")
             print(f"✅ Conexao bem sucedida e {table_count} tabelas verificadas.")
 
-            print("query de teste:")
-            query = text(
-                """
-                SELECT table_name 
-                FROM information_schema.tables 
-                WHERE table_schema = 'public' 
-                ORDER BY table_name;
-                """
-            )
-
-            result = await conn.execute(query)
-
-            table_names = [row[0] for row in result.all()]
-            
-
             print("Conexao bem sucedida e tabelas verificadas/criadas.")
-            print("tabelas encontradas: ", len(table_names))
 
-
-            
-    
     except Exception as e:
         print("erro de conexao: ", e)
         raise e
-    
-
-
-
-
 
 
 def get_session() -> AsyncSession:
-
     return AsyncSession(async_engine)
 
 
-
-
-
+if __name__ ==  "__main__":
+    asyncio.run(init_db())

@@ -21,7 +21,7 @@ services:
       SECRET_KEY: ${SECRET_KEY}
 
   db:
-    image: postgres:16.2
+    image: postgres:16
     container_name: db_spotify_analytics
     
     volumes:
