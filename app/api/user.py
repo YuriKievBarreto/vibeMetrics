@@ -2,16 +2,15 @@ from fastapi import APIRouter, Request, Depends, HTTPException, status
 from starlette.responses import  JSONResponse
 from app.core.dependencies import get_current_user_id
 from app.services.data_ingestion_service import refresh_and_get_access_token
-from app.services.crud.user_crud import atualizar_credenciais_usuario, ler_usuario
+from app.repositories.user_repository import atualizar_credenciais_usuario, ler_usuario
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
 from datetime import datetime, timezone
-from app.services.crud.user_crud import ler_usuario
+from app.repositories.user_repository import ler_usuario, get_basic_data, atualizar_perfil_emocional
 from app.services.spotipy_service import get_top_faixas, get_top_artistas, get_user_top_genres
-from app.services.crud.relacionamentos_crud import ler_usuario_top_faixas, ler_usuario_top_artistas
+from app.repositories.usuario_top_faixa_repository import ler_usuario_top_faixas
+from app.repositories.usuario_top_artista_repository import ler_usuario_top_artistas
 from app.services.emotion_extraction_service import get_media_emocoes, get_perfil_emocional, get_analise_musica
-from app.services.crud.user_crud import ler_usuario, get_basic_data, atualizar_perfil_emocional
-from app.services.crud.relacionamentos_crud import ler_usuario_top_faixas, ler_usuario_top_artistas
 import asyncio
 import json
 

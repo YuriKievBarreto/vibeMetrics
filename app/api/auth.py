@@ -6,7 +6,7 @@ from fastapi import BackgroundTasks
 from app.services.data_ingestion_service import salvar_dados_iniciais_do_usuario, salvar_top_faixas, salvar_top_artistas
 from app.core.security import create_access_token   
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.services.crud.user_crud import ler_usuario
+from app.repositories.user_repository import ler_usuario
 from app.core.database import get_session
 from app.core.database import async_engine
 from app.api.user import valida_credenciais
@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DEFAULT_ADDRESS  = os.getenv("DEFAULT_ADDRESS")
+FRONTEND_ADDRESS = os.getenv("FRONTEND_ADDRESS")
 
 
 
@@ -63,10 +64,10 @@ async def spotify_callback(
 
     # Passo 4: Gera o token de sessão da sua aplicação
     session_token = create_access_token(subject=user_id)
-
+    print(f"CHEGUEI AQUI,{FRONTEND_ADDRESS}/dashboard.html")
     # Passo 5: Resposta imediata ao navegador
     response = RedirectResponse(
-        f"{DEFAULT_ADDRESS}/static/dashboard.html",
+        f"{FRONTEND_ADDRESS}/dashboard.html",
         status_code=status.HTTP_302_FOUND
     )
 

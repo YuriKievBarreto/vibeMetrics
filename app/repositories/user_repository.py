@@ -4,7 +4,8 @@ from sqlalchemy.future import select
 from app.models.usuario import Usuario  
 from datetime import datetime
 from app.core.database import async_engine
-from app.services.crud.relacionamentos_crud import ler_usuario_top_faixas, ler_usuario_top_artistas
+from app.repositories.usuario_top_artista_repository import ler_usuario_top_artistas
+from app.repositories.usuario_top_faixa_repository import ler_usuario_top_faixas
 from app.utils.general import contar_elementos
 from sqlalchemy import update
 from sqlalchemy.exc import SQLAlchemyError

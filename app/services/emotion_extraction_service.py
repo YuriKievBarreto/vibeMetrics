@@ -4,14 +4,13 @@ import asyncio
 from functools import partial
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-from app.services.crud.user_crud import ler_usuario
 import math
 from app.core.aws_config import aws_bedrock_client
 import json
 from botocore.exceptions import ClientError
 import time
 
-MODEL_ID = "amazon.nova-lite-v1:0"
+MODEL_ID = "us.amazon.nova-micro-v1:0"
 MODEL_ID_2 = "amazon.nova-pro-v1:0"
 
 
