@@ -74,32 +74,25 @@
   </footer>
 
  <script type="module">
-  import {endereco_api_em_uso} from "./utils.js"
-  console.log("ENDERECO::::::", endereco_api_em_uso)
-  
+  import { API_ENDPOINTS, LOGIN_URL, endereco_api_em_uso } from "./utils.js";
   
   document.addEventListener("click", (e) => {
-  if (e.target.id === "btn-entrar") {
-    fetch(`${endereco_api_em_uso}/api/v1/user/me`, {
-    method: 'GET',
-    credentials: 'include' 
-})
-.then(response => {
-    if (response.status === 401) {
-        console.error("Autenticação falhou! Redirecionar para login.");
-       
-       window.location.href = `${endereco_api_em_uso}/api/v1/auth/login`;
-
-    } else {
-        console.log("session token encontrado, login efetuado")
-        console.log("redirecionando para dashboard")
-        window.location.href = `${endereco_api_em_uso}/frontend/dashboard.html`
-
+    if (e.target.id === "btn-entrar") {
+      fetch(API_ENDPOINTS.ME, {
+        method: 'GET',
+        credentials: 'include' 
+      })
+      .then(response => {
+        if (response.status === 401) {
+          console.error("Autenticação falhou! Redirecionar para login.");
+          window.location.href = LOGIN_URL;
+        } else {
+          console.log("Session token encontrado, redirecionando para dashboard.");
+          window.location.href = `${endereco_api_em_uso}/frontend/dashboard.html`;
+        }
+      });
     }
-})
-
-  }
-});
+  });
 </script>
 </body>
 </html>

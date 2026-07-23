@@ -116,9 +116,7 @@
   </div> <!-- fim do layout flex -->
 
   <script type="module">
-      import {endereco_api_em_uso} from "./utils.js"
-
-
+    import { API_ENDPOINTS, handleLogout } from "./utils.js";
 
     // Gráfico vazio (será preenchido depois)
     const ctx2 = document.getElementById('genreChart').getContext('2d');
@@ -140,30 +138,13 @@
 
     // Logout
     const logoutButton = document.getElementById("logoutButton");
-    const logoutUrl = `${endereco_api_em_uso}/api/v1/user/logout`;
-    const redirectUrl = endereco_api_em_uso;
-
-    async function handleLogout() {
-      try {
-        const response = await fetch(logoutUrl, { method: 'POST', credentials: 'include' });
-
-        if (response.ok) {
-          window.location.href = redirectUrl;
-        } else {
-          alert("Não foi possível encerrar a sessão.");
-        }
-      } catch (error) {
-        alert("Erro de conexão.");
-      }
-    }
-
     if (logoutButton) {
       logoutButton.addEventListener("click", handleLogout);
     }
 
     // ================== CARREGAR DADOS DO USUÁRIO ==================
     (async () => {
-      const url = `${endereco_api_em_uso}/api/v1/user/get_user_basic_data`;
+      const url = API_ENDPOINTS.USER_BASIC_DATA;
 
       const loading = document.getElementById("loadingOverlay");
       loading.classList.remove("hidden"); // mostra loading

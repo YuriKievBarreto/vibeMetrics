@@ -125,24 +125,18 @@
 
   </main>
 
- <script type="module">
-  import {endereco_api_em_uso} from "./utils.js"
+  <script type="module">
+    import { API_ARTISTS_URL, HOME_URL, RANK_MAP, BUTTON_ACTIVE_CLASSES, BUTTON_INACTIVE_CLASSES, handleLogout } from "./utils.js";
     // ============================================================
     // CONFIGURAÇÃO E VARIÁVEIS GLOBAIS
     // ============================================================
-    
-   
-
-    const API_ARTISTS_URL = `${endereco_api_em_uso}/api/v1/user/top-artistas`;
-    const LOGOUT_URL = `${endereco_api_em_uso}/api/v1/user/logout`;
-    const HOME_URL = "/";
     
     // Variável global para armazenar os dados crus do Backend
     let allArtistsData = []; 
     let currentRankKey = 'short_rank'; // Estado inicial
 
     // Mapeamento das chaves de rank (deve coincidir com o JSON)
-    const rankMap = ['short_rank', 'medium_rank', 'long_rank'];
+    const rankMap = RANK_MAP;
 
     // Seletores DOM
     const filterButtons = document.querySelectorAll('.time-btn');
@@ -156,8 +150,8 @@
     const genreTagContainer = document.querySelector('.flex.flex-wrap.gap-2'); // Container de tags de gênero
     
     // Classes CSS
-    const activeClasses = ['bg-green-500', 'text-black', 'shadow'];
-    const inactiveClasses = ['text-gray-400', 'hover:text-white'];
+    const activeClasses = BUTTON_ACTIVE_CLASSES;
+    const inactiveClasses = BUTTON_INACTIVE_CLASSES;
 
 
     // ============================================================
@@ -303,11 +297,7 @@
     
     // Logout Logic
     if (logoutButton) {
-        logoutButton.addEventListener("click", async () => {
-            try { await fetch(LOGOUT_URL, { method: 'POST', credentials: 'include' }); } 
-            catch(e) {}
-            window.location.href = HOME_URL;
-        });
+        logoutButton.addEventListener("click", handleLogout);
     }
 
     // Filtros de Tempo (Lógica de Troca de Dados)

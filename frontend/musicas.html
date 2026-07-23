@@ -203,25 +203,16 @@
             2:30
           </div>
         </div>
-        
-      </div>
-    </section>
-
-  </main>
-
- <script type="module">
-  import {endereco_api_em_uso} from "./utils.js"
+   <script type="module">
+    import { API_TRACKS_URL, HOME_URL, RANK_MAP, BUTTON_ACTIVE_CLASSES, BUTTON_INACTIVE_CLASSES, handleLogout, formatDuration } from "./utils.js";
   
     // ============================================================
     // CONFIGURAÇÃO E VARIÁVEIS GLOBAIS
     // ============================================================
-    const API_TRACKS_URL = `${endereco_api_em_uso}/api/v1/user/top-musicas`; 
-    const LOGOUT_URL = `${endereco_api_em_uso}/api/v1/user/logout`;
-    const HOME_URL = "/";
     
     // Variáveis de Estado
     let allTracksData = []; 
-    const rankMap = ['short_rank', 'medium_rank', 'long_rank'];
+    const rankMap = RANK_MAP;
 
     // Seletores DOM
     const tracksContainer = document.getElementById("tracksContainer");
@@ -277,21 +268,8 @@
 };
 
     
-    const activeClasses = ['bg-green-500', 'text-black', 'shadow'];
-    const inactiveClasses = ['text-gray-400', 'hover:text-white'];
-
-
-    // ============================================================
-    // FUNÇÕES DE UTILIDADE E CÁLCULO
-    // ============================================================
-    
-    function formatDuration(ms) {
-        if (!ms) return "--:--";
-        const totalSeconds = Math.floor(ms / 1000);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    }
+    const activeClasses = BUTTON_ACTIVE_CLASSES;
+    const inactiveClasses = BUTTON_INACTIVE_CLASSES;
 
     // Encontra a emoção com maior valor no dicionário "emocoes"
     function getDominantEmotionData(emotionsObj) {
@@ -488,11 +466,7 @@
     
     // Logout Logic
     if (logoutButton) {
-        logoutButton.addEventListener("click", async () => {
-            try { await fetch(LOGOUT_URL, { method: 'POST', credentials: 'include' }); } 
-            catch(e) {}
-            window.location.href = HOME_URL;
-        });
+        logoutButton.addEventListener("click", handleLogout);
     }
 
     // Filtros de Tempo (Lógica de Troca de Dados)

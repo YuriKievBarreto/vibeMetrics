@@ -188,9 +188,7 @@
     </main>
 
     <script type="module">
-    import {endereco_api_em_uso} from "./utils.js"
-        const API_PERFIL_MUSICAL_URL = `${endereco_api_em_uso}/api/v1/user/perfil-musical`;
-        const HOME_URL = "/";
+        import { API_PERFIL_MUSICAL_URL, HOME_URL, handleLogout } from "./utils.js";
 
         const EMOTION_MAP = {
             'alegria': { color: 'yellow', emoji: '😄', gradient: 'gradient-yellow-orange' },
@@ -300,12 +298,7 @@
             }
         }
 
-        document.getElementById("logoutButton").addEventListener("click", async () => {
-            try {
-                await fetch(`${endereco_api_em_uso}/api/v1/user/logout`, { method: 'POST', credentials: 'include' });
-                window.location.href = HOME_URL;
-            } catch(e) { window.location.href = HOME_URL; }
-        });
+        document.getElementById("logoutButton").addEventListener("click", handleLogout);
 
         document.addEventListener("DOMContentLoaded", loadEmotionData);
     </script>
