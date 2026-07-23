@@ -136,26 +136,41 @@ async def user_top_musicas(user_id: str = Depends(get_current_user_id)):
         raise HTTPException(status_code=404, detail="Nenhuma música encontrada para este usuário.")
 
   
-    lista_emocoes = [rel.faixa.emocoes for rel in relacionamentos]
-    duracoes = np.array([rel.faixa.duracao_ms for rel in relacionamentos])
-    popularidades = np.array([rel.faixa.popularidade for rel in relacionamentos])
+    lista_emocoes_validas = []
+    for rel in relacionamentos:
+        emo = rel.faixa.emocoes
+        if isinstance(emo, str):
+            try:
+                emo = json.loads(emo)
+            except Exception:
+                emo = None
+        if isinstance(emo, dict):
+            lista_emocoes_validas.append(emo)
 
-    
-    df_emocoes = pd.DataFrame(lista_emocoes)
-    
-  
-    medias_series = df_emocoes.mean().round(2)
-    
-  
-    sentimento_predominante = medias_series.idxmax()
-    pontuacao_predominante = medias_series.max()
+    duracoes = np.array([rel.faixa.duracao_ms for rel in relacionamentos if rel.faixa.duracao_ms is not None])
+    popularidades = np.array([rel.faixa.popularidade for rel in relacionamentos if rel.faixa.popularidade is not None])
 
-    
+    if lista_emocoes_validas:
+        df_emocoes = pd.DataFrame(lista_emocoes_validas)
+        medias_series = df_emocoes.mean(numeric_only=True).round(2)
+        if not medias_series.empty and not medias_series.isna().all():
+            sentimento_predominante = str(medias_series.idxmax())
+            pontuacao_predominante = float(medias_series.max())
+        else:
+            sentimento_predominante = "Nenhum"
+            pontuacao_predominante = 0.0
+    else:
+        sentimento_predominante = "Nenhum"
+        pontuacao_predominante = 0.0
+
+    duracao_media = int(np.round(duracoes.mean(), 0)) if len(duracoes) > 0 else 0
+    popularidade_media = float(np.round(popularidades.mean(), 0)) if len(popularidades) > 0 else 0.0
+
     dict_resposta = {
-        "sentimento_predominante": str(sentimento_predominante),
-        "pontuacao_sentimento_predominante": float(pontuacao_predominante),
-        "duracao_media_ms": int(np.round(duracoes.mean(), 0)),
-        "popularidade_media": float(np.round(popularidades.mean(), 0)),
+        "sentimento_predominante": sentimento_predominante,
+        "pontuacao_sentimento_predominante": pontuacao_predominante,
+        "duracao_media_ms": duracao_media,
+        "popularidade_media": popularidade_media,
         "faixas": [converter_faixa_e_relacionamento_para_dict(rel) for rel in relacionamentos]
     }
 
@@ -165,11 +180,17 @@ async def user_top_musicas(user_id: str = Depends(get_current_user_id)):
 
 
 def converter_faixa_e_relacionamento_para_dict(rel):
+    emo = rel.faixa.emocoes
+    if isinstance(emo, str):
+        try:
+            emo = json.loads(emo)
+        except Exception:
+            pass
     return {
         "nome_faixa": rel.faixa.nome_faixa,
         "album": rel.faixa.album,
         "link_imagem": rel.faixa.link_imagem,
-        "emocoes": rel.faixa.emocoes,
+        "emocoes": emo,
         "duracao_ms": rel.faixa.duracao_ms,
         "short_rank": rel.short_time_rank,
         "medium_rank": rel.medium_time_rank,
@@ -230,8 +251,8 @@ async def get_perfil_musical(user_id: str = Depends(get_current_user_id)):
     top2_intensidade = copia_media[top2_nome]
 
   
-    faixa_top1 = max(lista_faixas, key=lambda f: f.emocoes.get(top1_nome, 0))
-    faixa_top2 = max(lista_faixas, key=lambda f: f.emocoes.get(top2_nome, 0))
+    faixa_top1 = max(lista_faixas, key=lambda f: (f.emocoes or {}).get(top1_nome, 0))
+    faixa_top2 = max(lista_faixas, key=lambda f: (f.emocoes or {}).get(top2_nome, 0))
 
 
     tarefas_ia = [
@@ -245,14 +266,14 @@ async def get_perfil_musical(user_id: str = Depends(get_current_user_id)):
    
     dict_faixa1 = to_dict(faixa_top1)
     dict_faixa1.update({
-        "emocao_mais_alta": faixa_top1.emocoes.get(top1_nome),
+        "emocao_mais_alta": (faixa_top1.emocoes or {}).get(top1_nome),
         "analise": json.loads(analise_raw1)
     })
     dict_faixa1.pop("emocoes", None)
 
     dict_faixa2 = to_dict(faixa_top2)
     dict_faixa2.update({
-        "emocao_mais_alta": faixa_top2.emocoes.get(top2_nome),
+        "emocao_mais_alta": (faixa_top2.emocoes or {}).get(top2_nome),
         "analise": json.loads(analise_raw2)
     })
     dict_faixa2.pop("emocoes", None)

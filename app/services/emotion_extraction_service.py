@@ -119,18 +119,28 @@ Letra da música:
 async def get_media_emocoes(emocoes: list):
         print("extraindo media de emocoes...")
         dict_media_emocoes = {}
-       
+        emocoes_validas = []
+
         for item in emocoes:
+            if isinstance(item, str):
+                try:
+                    item = json.loads(item)
+                except Exception:
+                    item = None
+            if isinstance(item, dict):
+                emocoes_validas.append(item)
+
+        if not emocoes_validas:
+            return {}
+
+        for item in emocoes_validas:
             for a, b in item.items():
-                if a not in dict_media_emocoes:
-                    dict_media_emocoes[a] = b
-                else:
-                    dict_media_emocoes[a] += b
-                   
+                if isinstance(b, (int, float)):
+                    dict_media_emocoes[a] = dict_media_emocoes.get(a, 0.0) + b
 
+        total = len(emocoes_validas)
         for chave, valor in dict_media_emocoes.items():
-            dict_media_emocoes[chave] = round(valor/len(emocoes), 2)
-
+            dict_media_emocoes[chave] = round(valor / total, 2)
 
         return dict_media_emocoes
 
