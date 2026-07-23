@@ -176,18 +176,17 @@ async def salvar_top_faixas(user_id:str, access_token:str):
         
         
         print("extraindo emocoes")
-        lista_letras = [
-            faixa["letra"] 
-            for faixa in top_faixas_unicas.values() 
-            if faixa["letra"] is not None
-            ]
-    
+        faixas_com_letra = [faixa for faixa in top_faixas_unicas.values() if faixa["letra"] is not None]
+        lista_letras = [faixa["letra"] for faixa in faixas_com_letra]
 
-        lista_emocoes = await extrair_emocoes_batch_bedrock(lista_letras, chunk_size=5)
+        if lista_letras:
+            lista_emocoes = await extrair_emocoes_batch_bedrock(lista_letras, chunk_size=5)
+            for faixa, emocoes in zip(faixas_com_letra, lista_emocoes):
+                faixa["emocoes"] = emocoes
 
-
-        for i, (chave, dados_faixa) in enumerate(top_faixas_unicas.items()):
-            dados_faixa["emocoes"] = lista_emocoes[i]
+        for faixa in top_faixas_unicas.values():
+            if "emocoes" not in faixa:
+                faixa["emocoes"] = None
 
         
         

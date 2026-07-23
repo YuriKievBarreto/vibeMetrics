@@ -63,14 +63,19 @@ async def get_top_faixas(access_token: str, quantitade: int = 20, time_ranges: l
             if track_id not in final_unified_tracks:
                 
             
+                album_images = item.get("album", {}).get("images", [])
+                link_imagem = album_images[1]["url"] if len(album_images) > 1 else (album_images[0]["url"] if album_images else None)
+                artists = item.get("artists", [])
+                artista_principal = artists[0]["name"] if artists else "Desconhecido"
+
                 track_data = {
                     "id_faixa": track_id,
                     "nome_faixa": item["name"],
-                    "link_imagem": item["album"]["images"][1]["url"],
-                    "artista_principal": item["artists"][0]["name"],
+                    "link_imagem": link_imagem,
+                    "artista_principal": artista_principal,
                     "popularidade": item["popularity"],
                     "duracao_ms": item["duration_ms"],
-                    "album": item["album"]["name"],
+                    "album": item.get("album", {}).get("name", ""),
                 }
 
                
@@ -112,10 +117,13 @@ async def get_top_artistas(access_token: str, quantitade: int = 20, time_ranges:
             if artist_id not in final_unified_artists:
                 
             
+                artist_images = item.get("images", [])
+                link_imagem = artist_images[1]["url"] if len(artist_images) > 1 else (artist_images[0]["url"] if artist_images else None)
+
                 track_data = {
                     "id_artista": artist_id,
                     "nome_artista": item["name"],
-                    "link_imagem": item["images"][1]["url"],
+                    "link_imagem": link_imagem,
                     "generos": item["genres"],
                     "popularidade_artista": item["popularity"]
                 }
