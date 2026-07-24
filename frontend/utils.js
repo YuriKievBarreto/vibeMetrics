@@ -12,9 +12,9 @@ export const LOGOUT_URL = `${endereco_api_em_uso}/api/v1/user/logout`;
 export const API_ENDPOINTS = {
   ME: `${endereco_api_em_uso}/api/v1/user/me`,
   USER_BASIC_DATA: `${endereco_api_em_uso}/api/v1/user/get_user_basic_data`,
-  TOP_ARTISTS: `${endereco_api_em_uso}/api/v1/user/top-artistas`,
-  TOP_TRACKS: `${endereco_api_em_uso}/api/v1/user/top-musicas`,
-  PERFIL_MUSICAL: `${endereco_api_em_uso}/api/v1/user/perfil-musical`,
+  TOP_ARTISTS: `${endereco_api_em_uso}/api/v1/user/top_artistas`,
+  TOP_TRACKS: `${endereco_api_em_uso}/api/v1/user/top_musicas`,
+  PERFIL_MUSICAL: `${endereco_api_em_uso}/api/v1/user/perfil_musical`,
   LOGOUT: LOGOUT_URL
 };
 

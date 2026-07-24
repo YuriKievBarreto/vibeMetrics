@@ -127,7 +127,7 @@ async def valida_credenciais(spotify_user_id: str, db: AsyncSession):
     print("token não expirado")
 
 
-@user_router.get("/top-musicas")
+@user_router.get("/top_musicas")
 async def user_top_musicas(user_id: str = Depends(get_current_user_id)):
     
     relacionamentos = await ler_usuario_top_faixas(user_id)
@@ -199,7 +199,7 @@ def converter_faixa_e_relacionamento_para_dict(rel):
         "artista_principal": rel.faixa.artista_principal
     }
 
-@user_router.get("/top-artistas")
+@user_router.get("/top_artistas")
 async def user_top_artistas( user_id: str = Depends(get_current_user_id)):
 
     relacoinamentos = await ler_usuario_top_artistas(user_id)
@@ -225,7 +225,7 @@ def converter_artista_e_relacionamento_para_dict(rel):
 
 
 
-@user_router.get("/perfil-musical")
+@user_router.get("/perfil_musical")
 async def get_perfil_musical(user_id: str = Depends(get_current_user_id)):
     usuario_banco = await ler_usuario(user_id)
     
