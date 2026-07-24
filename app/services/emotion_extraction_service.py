@@ -1,26 +1,122 @@
-
 import sys
 import asyncio
 from functools import partial
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-import math
-from app.core.aws_config import aws_bedrock_client
 import json
-from botocore.exceptions import ClientError
 import time
+from dotenv import load_dotenv
 
-MODEL_ID = "us.amazon.nova-micro-v1:0"
-MODEL_ID_2 = "amazon.nova-pro-v1:0"
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
+load_dotenv()
+
+from app.core.aws_config import aws_bedrock_client
+
+# ==============================================================================
+# CONFIGURAÇÃO DE PROVEDORES E MODELOS
+# ==============================================================================
+
+# Defina o provedor ativo: "groq" ou "bedrock" (pode ser alternado via env EMOTION_LLM_PROVIDER)
+PROVEDOR_LLM = os.getenv("EMOTION_LLM_PROVIDER", "groq").lower()# Lista de modelos do Groq (Free Tier) ordenados por prioridade para fallback automático
+GROQ_FALLBACK_CHAIN = [
+    "llama-3.3-70b-versatile",        # 1. Recomendado (Llama 3.3 70B)
+    "llama-3.1-70b-versatile",        # 2. Llama 3.1 70B
+    "llama-3.1-8b-instant",           # 3. Llama 3.1 8B (Ultra Rápido)
+    "mixtral-8x7b-32768",             # 4. Mixtral 8x7B (Excelente em JSON)
+    "llama3-70b-8192",                # 5. Llama 3 70B
+    "llama3-8b-8192",                 # 6. Llama 3 8B
+    "gemma2-9b-it",                   # 7. Google Gemma 2 9B
+    "deepseek-r1-distill-llama-70b"   # 8. DeepSeek R1 Distill 70B
+]
+
+MODELO_BEDROCK_ATUAL = "amazon.nova-pro-v1:0"
 
 
+# ==============================================================================
+# FUNÇÕES DE CHAMADA GENÉRICA ÀS APIS DOS LLMS
+# ==============================================================================
+
+async def chamar_groq_api(prompt: str, is_json: bool = True) -> str:
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY não foi encontrada no arquivo .env ou variáveis de ambiente.")
+
+    erros = []
+    for model_id in GROQ_FALLBACK_CHAIN:
+        try:
+            try:
+                from groq import AsyncGroq
+                client = AsyncGroq(api_key=api_key)
+                kwargs = {
+                    "model": model_id,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.1
+                }
+                if is_json:
+                    kwargs["response_format"] = {"type": "json_object"}
+                response = await client.chat.completions.create(**kwargs)
+                return response.choices[0].message.content
+            except ImportError:
+                import urllib.request
+                url = "https://api.groq.com/openai/v1/chat/completions"
+                headers = {
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json"
+                }
+                payload = {
+                    "model": model_id,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.1
+                }
+                if is_json:
+                    payload["response_format"] = {"type": "json_object"}
+                    
+                req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers)
+                
+                def _fetch():
+                    with urllib.request.urlopen(req) as resp:
+                        res_body = resp.read().decode("utf-8")
+                        res_json = json.loads(res_body)
+                        return res_json["choices"][0]["message"]["content"]
+
+                return await asyncio.to_thread(_fetch)
+        except Exception as e:
+            print(f"⚠️ Groq [{model_id}] falhou ou atingiu limite ({e}). Alternando para o próximo modelo do Free Tier...")
+            erros.append((model_id, str(e)))
+            await asyncio.sleep(0.3)
+
+    raise RuntimeError(f"Todos os {len(GROQ_FALLBACK_CHAIN)} modelos do Groq falharam. Detalhes: {erros}")
 
 
+async def chamar_bedrock_api(prompt: str, model_id: str = MODELO_BEDROCK_ATUAL) -> str:
+    call = partial(
+        aws_bedrock_client.converse,
+        modelId=model_id,
+        messages=[{"role": "user", "content": [{"text": prompt}]}]
+    )
+    response = await asyncio.to_thread(call)
+    return response["output"]["message"]["content"][0]["text"]
+
+
+async def executar_chamada_llm(prompt: str, is_json: bool = True) -> str:
+    if PROVEDOR_LLM == "groq":
+        try:
+            return await chamar_groq_api(prompt, is_json=is_json)
+        except Exception as e:
+            print(f"⚠️ Todos os modelos Groq no Free Tier falharam ({e}). Fazendo fallback de emergência para AWS Bedrock...")
+            return await chamar_bedrock_api(prompt, model_id=MODELO_BEDROCK_ATUAL)
+    else:
+        return await chamar_bedrock_api(prompt, model_id=MODELO_BEDROCK_ATUAL)
+
+
+# ==============================================================================
+# FUNÇÕES DA APLICAÇÃO
+# ==============================================================================
 
 async def get_perfil_emocional(emocoes: dict) -> str:
-    print("analisando perfil emocional...")
-    prompt =  f"""
-    Você é um analista especializado em comportamento musical e perfil emocional.
+    print(f"analisando perfil emocional (Provedor: {PROVEDOR_LLM.upper()})...")
+    prompt = f"""
+Você é um analista especializado em comportamento musical e perfil emocional.
 
 A seguir está um JSON com a média das intensidades emocionais (0 a 1) identificadas nas músicas mais ouvidas do usuário:
 
@@ -35,155 +131,111 @@ Com base nesses valores, escreva um texto curto (OBRIGATORIAMENTE no máximo 3 l
 - Não cite números ou valores do JSON.
 - Não repita o JSON.
 - Não use linguagem técnica de análise; apenas interpretação natural.
-- Dê ênfase nas duas emoções com pontuação mais alta, mas sem citar valores
-    
-
+- Dê ênfase nas duas emoções com pontuação mais alta, mas sem citar valores.
 """
-    
-    call = partial(
-        aws_bedrock_client.converse,
-        modelId="amazon.nova-lite-v1:0",
-        messages=[{"role": "user", "content": [{"text": prompt}]}]
-    )
-
     try:
-        response = await asyncio.to_thread(call)
-        raw_output = response["output"]["message"]["content"][0]["text"]
+        raw_output = await executar_chamada_llm(prompt, is_json=False)
         raw_output = raw_output.replace("```json", "").replace("```", "").strip()
         print("perfil emocional analisado com sucesso!")
         return raw_output
     except Exception as e:
-        print(f"Erro ao chamar Bedrock: {e}")
-        return {"erro": str(e)}
-    
+        print(f"Erro ao analisar perfil emocional: {e}")
+        chaves = list(emocoes.keys())[:2] if isinstance(emocoes, dict) else []
+        return f"Perfil musical diversificado focado em {chaves}."
 
 
-async def get_analise_musica(EMOCAO: str, LETRA):
-    print("analisando musica...")
+async def get_analise_musica(EMOCAO: str, LETRA: str):
+    print(f"analisando musica (Provedor: {PROVEDOR_LLM.upper()})...")
     prompt = f"""
-
-    Instruções:
+Instruções:
 Você receberá:
-
 Uma emoção predominante, já identificada por outro modelo.
-
 A letra completa de uma música.
 
 Sua tarefa é:
-
 Identificar qual verso ou estrofe da letra tem maior relação direta com a emoção fornecida.
-
 A resposta deve trazer apenas um trecho (o mais relevante).
-
 Explique brevemente por que esse trecho se conecta com a emoção.
 
 Regras:
-    - Retorne SOMENTE o JSON.
-    - Seja intuitivo, direto e humano.
-    - Faça questão de embelezar a explicação, evidenciando um lado poético.
+- Retorne SOMENTE o JSON.
+- Seja intuitivo, direto e humano.
+- Faça questão de embelezar a explicação, evidenciando um lado poético.
 
 Formato exato da resposta:
-
 {{
   "citacao": "<TRECHO DA LETRA>",
   "explicacao": "<EXPLICAÇÃO CURTA>"
 }}
 
-
 Dados fornecidos:
 Emoção predominante: '{EMOCAO}'
 Letra da música:
 '{LETRA}'
-
 """
-
-    
-
-    call = partial(
-    aws_bedrock_client.converse,
-    modelId="amazon.nova-lite-v1:0",
-    messages=[{"role": "user", "content": [{"text": prompt}]}]
-)
-
     try:
-        response = await asyncio.to_thread(call)
-        raw_output = response["output"]["message"]["content"][0]["text"]
+        raw_output = await executar_chamada_llm(prompt, is_json=True)
         raw_output = raw_output.replace("```json", "").replace("```", "").strip()
         print(f"musica de emocao {EMOCAO} analisada com sucesso!")
         return raw_output
     except Exception as e:
-        print(f"Erro ao chamar Bedrock: {e}")
-        return {"erro": str(e)}
-    
+        print(f"Erro ao analisar musica: {e}")
+        return json.dumps({"citacao": "Não foi possível extrair a citação.", "explicacao": "Erro na análise."})
+
 
 async def get_media_emocoes(emocoes: list):
-        print("extraindo media de emocoes...")
-        dict_media_emocoes = {}
-        emocoes_validas = []
+    print("extraindo media de emocoes...")
+    dict_media_emocoes = {}
+    emocoes_validas = []
 
-        for item in emocoes:
-            if isinstance(item, str):
-                try:
-                    item = json.loads(item)
-                except Exception:
-                    item = None
-            if isinstance(item, dict):
-                emocoes_validas.append(item)
+    for item in emocoes:
+        if isinstance(item, str):
+            try:
+                item = json.loads(item)
+            except Exception:
+                item = None
+        if isinstance(item, dict):
+            emocoes_validas.append(item)
 
-        if not emocoes_validas:
-            return {}
+    if not emocoes_validas:
+        return {}
 
-        for item in emocoes_validas:
-            for a, b in item.items():
-                if isinstance(b, (int, float)):
-                    dict_media_emocoes[a] = dict_media_emocoes.get(a, 0.0) + b
+    for item in emocoes_validas:
+        for a, b in item.items():
+            if isinstance(b, (int, float)):
+                dict_media_emocoes[a] = dict_media_emocoes.get(a, 0.0) + b
 
-        total = len(emocoes_validas)
-        for chave, valor in dict_media_emocoes.items():
-            dict_media_emocoes[chave] = round(valor / total, 2)
+    total = len(emocoes_validas)
+    for chave, valor in dict_media_emocoes.items():
+        dict_media_emocoes[chave] = round(valor / total, 2)
 
-        return dict_media_emocoes
+    return dict_media_emocoes
 
 
-def montar_prompt_batch(lista_de_letras):
-    itens = []
-    for i, letra in enumerate(lista_de_letras):
-        itens.append(f'"letra_{i}": "{letra}"')
-
-    letras_json = "{\n" + ",\n".join(itens) + "\n}"
-
+def montar_prompt_individual(letra: str) -> str:
     return f"""
 Você é um analisador emocional especializado.
 
-Sua tarefa é analisar cada letra e identificar a intensidade de cada emoção listada abaixo.
+Sua tarefa é analisar a letra de música fornecida abaixo e identificar a intensidade de cada emoção listada.
 
 IMPORTANTE:
 - O raciocínio deve acontecer INTERNAMENTE.
-- NÃO revele explicações, etapas, análises, divisão por seções ou qualquer texto fora do JSON final.
-- A saída final deve conter APENAS um ARRAY JSON, na mesma ordem das letras recebidas.
-
-Processo interno que você DEVE seguir (sem mostrar):
-1. Leia cada letra inteira.
-2. Resuma internamente a letra.
-3. Identifique os temas principais internamente.
-4. Separe a letra internamente em seções (verso/refrão/ponte).
-5. Avalie emoções SOMENTE quando houver elementos explícitos ou diretamente sugeridos pelo texto.
-6. Evite interpretações subjetivas ou simbólicas.
-7. Gere as pontuações emocionais baseando-se apenas no texto.
+- NÃO revele explicações, etapas, análises ou qualquer texto fora do JSON final.
+- A saída final deve conter APENAS um ÚNICO OBJETO JSON com as emoções da letra fornecida.
 
 REGRAS:
-- A saída deve ser SOMENTE um ARRAY JSON.
+- A saída deve ser SOMENTE um OBJETO JSON (chave: valor).
 - Não explique nada.
 - Não descreva nada fora do JSON.
 - Não infira nada que não esteja explícito na letra.
 - Não interprete símbolos, metáforas ou contexto cultural.
 - Não adivinhe sentimentos implícitos.
 - Não altere nomes das chaves.
-- Todos os itens devem conter TODAS as emoções.
+- O objeto deve conter TODAS as emoções listadas.
 - Valores entre 0.0 e 1.0.
 - Use 0.0 quando a emoção não estiver presente de forma clara.
 
-FORMATO DE CADA ITEM DO ARRAY:
+FORMATO DA RESPOSTA (OBJETO JSON):
 {{
   "alegria": 0.0, "otimismo": 0.0, "esperanca": 0.0,
   "introspeccao": 0.0, "paz": 0.0, "amor": 0.0,
@@ -193,72 +245,45 @@ FORMATO DE CADA ITEM DO ARRAY:
   "autoafirmacao": 0.0, "sensualidade": 0.0, "sexual_explicit": 0.0
 }}
 
-LETRAS:
-{letras_json}
+LETRA DA MÚSICA:
+{letra}
 
-Retorne agora SOMENTE o ARRAY JSON.
+Retorne agora SOMENTE o OBJETO JSON.
 """
 
 
-async def extrair_emocoes_batch_bedrock(lista_de_letras: list[str], chunk_size=1):
-    resultados_finais = []
+async def extrair_emocao_individual(idx: int, total: int, letra: str, semaphore: asyncio.Semaphore):
+    if not letra or not str(letra).strip():
+        return None
 
-    print(f"\n⚙️ Iniciando batch com {len(lista_de_letras)} letras, chunk_size = {chunk_size}")
-
-    for idx, chunk in enumerate(chunk_list(lista_de_letras, chunk_size)):
-        print(f"\n📦 --- Chunk {idx+1} ---")
-        print(f"Contém {len(chunk)} letras")
-
-        # medir tempo de geração do prompt
-        t0 = time.time()
-        prompt = montar_prompt_batch(chunk)
-        t1 = time.time()
-        print(f"⏱️ Tempo para montar prompt: {t1 - t0:.2f}s")
-        print(f"📄 Prompt tem {len(prompt)} caracteres")
-
-        # chamada à API
-        print("🚀 Enviando chunk para o Bedrock...")
-        t2 = time.time()
-
-        call = partial(
-            aws_bedrock_client.converse,
-            modelId=MODEL_ID_2,
-            messages=[{"role": "user", "content": [{"text": prompt}]}]
-        )
+    async with semaphore:
+        print(f"🚀 [{idx + 1}/{total}] Enviando letra ({PROVEDOR_LLM.upper()})...")
+        prompt = montar_prompt_individual(letra)
 
         try:
-            response = await asyncio.to_thread(call)
-        except Exception as e:
-            print(f"❌ Erro no chunk {idx+1}: {e}")
-            resultados_finais.extend([None] * len(chunk))
-            continue
-
-        t3 = time.time()
-        print(f"✅ Resposta recebida em {t3 - t2:.2f}s")
-
-        # processamento do retorno
-        raw = response["output"]["message"]["content"][0]["text"]
-        raw = raw.replace("```json", "").replace("```", "").strip()
-
-        print("📥 JSON bruto retornado:")
-        print(raw[:500] + ("..." if len(raw) > 500 else ""))  
-
-        try:
+            t0 = time.time()
+            raw = await executar_chamada_llm(prompt, is_json=True)
+            t1 = time.time()
+            raw = raw.replace("```json", "").replace("```", "").strip()
             parsed = json.loads(raw)
-            print(f"🟢 JSON válido. Foram retornados {len(parsed)} itens.")
-        except json.JSONDecodeError as e:
-            print("❌ Erro ao converter JSON:", e)
-            parsed = [None] * len(chunk)
-
-        resultados_finais.extend(parsed)
-
-    print("\n🎉 Batch finalizado!")
-    print(f"Total de resultados: {len(resultados_finais)}\n")
-
-    return resultados_finais
+            print(f"✅ [{idx + 1}/{total}] Concluído em {t1 - t0:.2f}s")
+            if isinstance(parsed, dict):
+                return parsed
+            elif isinstance(parsed, list) and len(parsed) > 0 and isinstance(parsed[0], dict):
+                return parsed[0]
+            return None
+        except Exception as e:
+            print(f"❌ [{idx + 1}/{total}] Erro na extração: {e}")
+            return None
 
 
-def chunk_list(lista, tamanho):
-    for i in range(0, len(lista), tamanho):
-        yield lista[i:i + tamanho]
-
+async def extrair_emocoes_batch_bedrock(lista_de_letras: list[str], chunk_size: int = 5, max_concurrency: int = 5):
+    total = len(lista_de_letras)
+    print(f"\n⚙️ Iniciando extração emocional ({PROVEDOR_LLM.upper()}) de {total} letras (concorrência máx: {max_concurrency})...")
+    
+    semaphore = asyncio.Semaphore(max_concurrency)
+    tarefas = [extrair_emocao_individual(i, total, letra, semaphore) for i, letra in enumerate(lista_de_letras)]
+    
+    resultados = await asyncio.gather(*tarefas)
+    print(f"🎉 Extração de {total} letras finalizada com sucesso! Total de resultados: {len(resultados)}\n")
+    return list(resultados)

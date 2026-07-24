@@ -264,17 +264,27 @@ async def get_perfil_musical(user_id: str = Depends(get_current_user_id)):
     texto_perfil, analise_raw1, analise_raw2 = await asyncio.gather(*tarefas_ia)
 
    
+    def parse_analise(raw):
+        if isinstance(raw, dict):
+            return raw
+        if isinstance(raw, str):
+            try:
+                return json.loads(raw)
+            except Exception:
+                return {"citacao": "Não foi possível carregar o trecho.", "explicacao": raw}
+        return {}
+
     dict_faixa1 = to_dict(faixa_top1)
     dict_faixa1.update({
         "emocao_mais_alta": (faixa_top1.emocoes or {}).get(top1_nome),
-        "analise": json.loads(analise_raw1)
+        "analise": parse_analise(analise_raw1)
     })
     dict_faixa1.pop("emocoes", None)
 
     dict_faixa2 = to_dict(faixa_top2)
     dict_faixa2.update({
         "emocao_mais_alta": (faixa_top2.emocoes or {}).get(top2_nome),
-        "analise": json.loads(analise_raw2)
+        "analise": parse_analise(analise_raw2)
     })
     dict_faixa2.pop("emocoes", None)
 

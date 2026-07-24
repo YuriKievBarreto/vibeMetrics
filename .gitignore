@@ -25,7 +25,7 @@ log/
 
 .env
 *.cache
-
+test_analise_letra.py
 /dist
 /build
 demos/

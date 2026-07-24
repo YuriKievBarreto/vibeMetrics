@@ -140,7 +140,7 @@ async def salvar_top_faixas(user_id:str, access_token:str):
     async with AsyncSession(async_engine) as db:
      
         print("puxando top 10 faixas de todos os periodos de tempo")
-        top_faixas = await get_top_faixas(access_token, quantitade=1, time_ranges=["short_term", "medium_term", "long_term"])
+        top_faixas = await get_top_faixas(access_token, quantitade=10, time_ranges=["short_term", "medium_term", "long_term"])
         
         top_faixas_unicas = {}
         tuplas_vistas = set()
