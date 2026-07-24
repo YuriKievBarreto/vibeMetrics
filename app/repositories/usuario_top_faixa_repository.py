@@ -1,4 +1,4 @@
-from app.schemas.schema_faixa import FaixaCreate
+from app.models.faixa import FaixaCreate
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import async_engine
 from app.models.usuario_top_faixa import UsuarioTopFaixa

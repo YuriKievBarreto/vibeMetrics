@@ -1,4 +1,4 @@
-from app.schemas.schema_artista import ArtistaCreate
+from app.models.artista import ArtistaCreate
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.artista import Artista  
 from sqlalchemy import select

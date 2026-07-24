@@ -5,6 +5,7 @@ from app.services.data_ingestion_service import refresh_and_get_access_token
 from app.repositories.user_repository import atualizar_credenciais_usuario, ler_usuario
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
+from app.models.gerais import LogoutResponse
 from datetime import datetime, timezone
 from app.repositories.user_repository import ler_usuario, get_basic_data, atualizar_perfil_emocional
 from app.services.spotipy_service import get_top_faixas, get_top_artistas, get_user_top_genres
@@ -37,19 +38,10 @@ async def me(
             "detail": "Sessão JWT validada e ativa."}
 
 
-@user_router.post("/logout")
+@user_router.post("/logout", response_model=LogoutResponse)
 async def logout(): 
-    response = JSONResponse(content={"message": "Logout bem sucedido"})
-
-    response.set_cookie(
-        key="session_token",
-        httponly=True,
-        secure=False,  # só porque é localhost
-        samesite="Lax",
-        max_age=43200 * 60,
-        path="/"
-    )
-
+    response = JSONResponse(content=LogoutResponse(message="Logout bem sucedido").model_dump())
+    response.delete_cookie(key="session_token", path="/")
     return response
 
 @user_router.get("/current_session_user_id")

@@ -14,3 +14,13 @@ class UsuarioTopFaixa(SQLModel, table=True):
 
     usuario: "Usuario" = Relationship(back_populates="top_faixas_rel")
     faixa: "Faixa" = Relationship(back_populates="top_usuarios_rel")
+
+
+class UsuarioTopFaixaCreate(SQLModel):
+   
+    id_usuario: str  
+    id_faixa: str   
+    short_time_rank: int
+    medium_time_rank: int
+    long_time_rank: int
+    

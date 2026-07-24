@@ -29,7 +29,7 @@ GROQ_FALLBACK_CHAIN = [
     "deepseek-r1-distill-llama-70b"   # 8. DeepSeek R1 Distill 70B
 ]
 
-MODELO_BEDROCK_ATUAL = "amazon.nova-pro-v1:0"
+MODELO_BEDROCK_ATUAL = "amazon.nova-micro-v1:0"
 
 
 # ==============================================================================

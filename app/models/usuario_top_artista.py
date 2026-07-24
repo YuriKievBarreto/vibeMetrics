@@ -17,3 +17,13 @@ class UsuarioTopArtista(SQLModel, table=True):
     artista: "Artista" = Relationship(back_populates="top_usuarios_rel")
 
 
+class UsuarioTopArtistaCreate(SQLModel):
+   
+    id_usuario: str 
+    id_artista: str  
+    
+    time_range: str
+    rank: int
+
+
+

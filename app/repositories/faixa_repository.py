@@ -1,4 +1,4 @@
-from app.schemas.schema_faixa import FaixaCreate
+from app.models.faixa import FaixaCreate
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.faixa import Faixa  
 from sqlalchemy.ext.asyncio import AsyncSession

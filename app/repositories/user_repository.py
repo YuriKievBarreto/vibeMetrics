@@ -1,4 +1,4 @@
-from app.schemas.schema_usuario import UsuarioCreate
+from app.models.usuario import UsuarioCreate
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.models.usuario import Usuario  

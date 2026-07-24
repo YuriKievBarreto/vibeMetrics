@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import DateTime, JSON
@@ -20,3 +20,27 @@ class Usuario(SQLModel, table=True):
 
     top_artistas_rel: List["UsuarioTopArtista"] = Relationship(back_populates="usuario")
     top_faixas_rel: List["UsuarioTopFaixa"] = Relationship(back_populates="usuario")
+
+
+
+class UsuarioCreate(SQLModel):
+    id_usuario: str
+    nome_exibicao: str
+    pais: str
+    
+  
+    access_token: str
+    refresh_token: str
+    token_expires_at: datetime 
+
+    ultima_atualizacao: datetime
+    status_processamento: str
+
+    perfil_emocional: Optional[Any] = None
+
+
+"""class UserBasicData(SQLModel):
+    "nome_exibicao": user_db.nome_exibicao,
+    "top_faixa": top_faixa,
+    "top_artista": top_artista,
+    "top_generos": top_generos"""

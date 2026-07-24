@@ -14,3 +14,14 @@ class Artista(SQLModel, table=True):
     generos: List[str] = Field(sa_type=postgresql.ARRAY(String))
 
     top_usuarios_rel: List["UsuarioTopArtista"] = Relationship(back_populates="artista")
+
+
+class ArtistaCreate(SQLModel):
+    id_artista: str = Field(..., alias='id') 
+    nome_artista: str = Field(..., alias='name') 
+    popularidade: int
+    generos:list
+
+    class Config:
+        populate_by_name = True 
+        extra = 'ignore'

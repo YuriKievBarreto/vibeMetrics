@@ -5,7 +5,7 @@ import asyncio
 from spotipy import Spotify
 from app.services.spotipy_service import get_top_faixas, get_top_artistas
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.schema_usuario import UsuarioCreate
+from app.models.usuario import UsuarioCreate
 from app.models.usuario_top_faixa import UsuarioTopFaixa
 from app.models.usuario_top_artista import UsuarioTopArtista
 from app.models.faixa import Faixa 
@@ -30,7 +30,6 @@ async def refresh_and_get_access_token(db: AsyncSession, user_id: str, refresh_t
     )
 
     new_access_token = new_token_info['access_token']
-    # access_token=new_token_info['access_token']
     new_refresh_token=new_token_info.get('refresh_token', refresh_token)
     expires_in=new_token_info['expires_in']
 
