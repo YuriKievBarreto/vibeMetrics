@@ -1,10 +1,11 @@
 const endereco_local = "http://127.0.0.1:8000";
+const endereco_frontend = "http://localhost:5501"
 const endereco_aws = "edereco aws";
 
 export const endereco_api_em_uso = endereco_local;
 
 // URLs Base da Aplicação
-export const HOME_URL = `${endereco_api_em_uso}/frontend/index.html`;
+export const HOME_URL = `${endereco_frontend}/frontend/index.html`;
 export const LOGIN_URL = `${endereco_api_em_uso}/api/v1/auth/login`;
 export const LOGOUT_URL = `${endereco_api_em_uso}/api/v1/user/logout`;
 
