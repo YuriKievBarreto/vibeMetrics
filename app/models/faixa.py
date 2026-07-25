@@ -26,16 +26,15 @@ class Faixa(SQLModel, table=True):
 
 class FaixaCreate(SQLModel):
     
-    id_faixa: str = Field(..., alias='id') 
-    nome_faixa: str = Field(..., alias='name')
+    id_faixa: str 
+    nome_faixa: str 
     emocoes: Optional[Dict[str, float]] = None
-    album: str = Field(..., alias='album') 
+    album: str  
     popularidade: int 
     duracao_ms: int 
-    link_imagem: str = Field(..., alias='link_imagem')
-    letra_faixa:  str = Field(..., alias='letra_faixa')
-    artista_principal: str = Field(..., alias='artista_principal')
-    
+    link_imagem: str 
+    letra_faixa:  str | None
+    artista_principal: str 
 
     class Config:
         populate_by_name = True 

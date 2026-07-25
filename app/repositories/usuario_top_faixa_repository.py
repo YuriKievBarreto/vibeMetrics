@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from typing import Type, List, Dict
 
-async def ler_usuario_top_faixas(id_usuario: str, quantidade: int=None):
+async def ler_usuario_top_faixas(id_usuario: str, quantidade: int=None) -> list[UsuarioTopFaixa]:
    async with AsyncSession(async_engine) as db:
       print("iniciando busca de relacionamentos")
       stmt = select(UsuarioTopFaixa).where(
@@ -22,4 +22,4 @@ async def ler_usuario_top_faixas(id_usuario: str, quantidade: int=None):
     ).limit(quantidade)
       
    result =  await db.execute(stmt)
-   return result.scalars().all()
+   return list(result.scalars().all())

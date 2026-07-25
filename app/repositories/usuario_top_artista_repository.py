@@ -12,7 +12,7 @@ from typing import Type, List, Dict
 
 
 
-async def ler_usuario_top_artistas(id_usuario: str, quantidade:str=None):
+async def ler_usuario_top_artistas(id_usuario: str, quantidade:int=None) -> list[UsuarioTopArtista]:
    async with AsyncSession(async_engine) as db:
       print("iniciando busca de relacionamentos")
       stmt = select(UsuarioTopArtista).where(
@@ -24,7 +24,7 @@ async def ler_usuario_top_artistas(id_usuario: str, quantidade:str=None):
     ).limit(quantidade)
       
    result =  await db.execute(stmt)
-   return result.scalars().all()
+   return list(result.scalars().all())
 
 
 

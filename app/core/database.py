@@ -22,7 +22,9 @@ def get_db_structure(sync_conn):
     for table_name in table_names:
         columns = inspector.get_columns(table_name)
         column_names = [col['name'] for col in columns]
-        db_structure[table_name] = column_names
+
+
+    print(db_structure)
 
     return db_structure
 
@@ -38,6 +40,7 @@ async def init_db():
         async with async_engine.begin() as conn:
             print("iniciando tentativa de conexao com o banco de dados")
             print("criando todas as tabelas")
+            await conn.run_sync(SQLModel.metadata.drop_all)
             await conn.run_sync(SQLModel.metadata.create_all)
             print("conexao bem sucedida")
 
@@ -63,7 +66,3 @@ async def init_db():
 
 def get_session() -> AsyncSession:
     return AsyncSession(async_engine)
-
-
-if __name__ ==  "__main__":
-    asyncio.run(init_db())

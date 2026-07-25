@@ -17,11 +17,11 @@ class Artista(SQLModel, table=True):
 
 
 class ArtistaCreate(SQLModel):
-    id_artista: str = Field(..., alias='id') 
-    nome_artista: str = Field(..., alias='name') 
-    popularidade: int
-    generos:list
-
+    id_artista: str = Field(...) 
+    nome_artista: str = Field(...) 
+    popularidade_artista: int
+    link_imagem: str
+    generos: List[str]
     class Config:
         populate_by_name = True 
         extra = 'ignore'

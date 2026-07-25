@@ -6,7 +6,7 @@ from app.core.database import async_engine
 from sqlalchemy import select
 
 
-async def ler_faixa(id_faixa:str):
+async def ler_faixa(id_faixa:str) -> Faixa | None:
      async with AsyncSession(async_engine) as db:
         try:
             db_faixa = await db.get(Faixa, id_faixa)
@@ -24,7 +24,7 @@ async def ler_faixa(id_faixa:str):
     
 
 
-async def criar_faixa(db: AsyncSession, faixa_data_dict):
+async def criar_faixa(db: AsyncSession, faixa_data_dict) -> Faixa | None:
 
     print("iniciandi criacao de faiax==x")
 
@@ -42,7 +42,7 @@ async def criar_faixa(db: AsyncSession, faixa_data_dict):
 
 
 
-async def salvar_faixas_em_batch(db: AsyncSession, lista_de_faixas_data: list[dict]):
+async def salvar_faixas_em_batch(db: AsyncSession, lista_de_faixas_data: list[FaixaCreate]) -> list[Faixa]:
 
     print(f"Processando {len(lista_de_faixas_data)} faixas para inserção...")
 
@@ -51,7 +51,7 @@ async def salvar_faixas_em_batch(db: AsyncSession, lista_de_faixas_data: list[di
         return []
 
     try:
-        ids_a_verificar = [faixa.get('id_faixa') for faixa in lista_de_faixas_data if faixa.get('id_faixa')]
+        ids_a_verificar = [faixa.model_dump().get('id_faixa') for faixa in lista_de_faixas_data if faixa.model_dump().get('id_faixa')]
         
         if not ids_a_verificar:
             print("Nenhum ID de faixa encontrado para verificação.")
@@ -69,7 +69,7 @@ async def salvar_faixas_em_batch(db: AsyncSession, lista_de_faixas_data: list[di
         faixas_a_inserir = [
             faixa_data 
             for faixa_data in lista_de_faixas_data
-            if faixa_data.get('id_faixa') not in ids_existentes
+            if faixa_data.id_faixa not in ids_existentes
         ]
 
         if not faixas_a_inserir:
@@ -77,7 +77,7 @@ async def salvar_faixas_em_batch(db: AsyncSession, lista_de_faixas_data: list[di
             return []
 
 
-        objetos_faixa = [Faixa(**faixa_data) for faixa_data in faixas_a_inserir]
+        objetos_faixa = [Faixa(**faixa_data.model_dump()) for faixa_data in faixas_a_inserir]
         db.add_all(objetos_faixa)
         await db.commit()
         

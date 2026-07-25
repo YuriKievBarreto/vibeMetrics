@@ -8,9 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.usuario import UsuarioCreate
 from app.models.usuario_top_faixa import UsuarioTopFaixa
 from app.models.usuario_top_artista import UsuarioTopArtista
-from app.models.faixa import Faixa 
+from app.models.faixa import Faixa, FaixaCreate
 from app.models.usuario import Usuario
-from app.models.artista import Artista #
+from app.models.artista import Artista, ArtistaCreate
 from sqlalchemy import select 
 from sqlalchemy.orm import selectinload, attributes 
 from datetime import datetime, timedelta, timezone
@@ -68,11 +68,7 @@ async def salvar_dados_iniciais_do_usuario(token_info):
         )
 
         
-        user_data_dict = user_create_data.model_dump()
-        db_user = await criar_usuario(db, user_data_dict)
-
-        
-
+        db_user = await criar_usuario(db, user_create_data)
         pass
 
 
@@ -139,7 +135,7 @@ async def salvar_top_faixas(user_id:str, access_token:str):
     async with AsyncSession(async_engine) as db:
      
         print("puxando top 10 faixas de todos os periodos de tempo")
-        top_faixas = await get_top_faixas(access_token, quantitade=10, time_ranges=["short_term", "medium_term", "long_term"])
+        top_faixas = await get_top_faixas(access_token, quantitade=1, time_ranges=["short_term", "medium_term", "long_term"])
         
         top_faixas_unicas = {}
         tuplas_vistas = set()
@@ -195,23 +191,24 @@ async def salvar_top_faixas(user_id:str, access_token:str):
        
         lista_faixas_para_adicionar = []
 
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
         for i, (chave, valor_faixa) in enumerate(top_faixas_unicas.items()):
             faixa_id = valor_faixa["id_faixa"]
+            print(valor_faixa)
             
-           
-            faixa_dict = {
-                "id_faixa": faixa_id,
-                "nome_faixa": valor_faixa["nome_faixa"],
-                "emocoes": valor_faixa["emocoes"],
-                "duracao_ms": valor_faixa["duracao_ms"],
-                "popularidade": valor_faixa["popularidade"],
-                "album": valor_faixa["album"],
-                "link_imagem": valor_faixa["link_imagem"],
-                "letra_faixa": valor_faixa["letra"],
-                "artista_principal": valor_faixa["artista_principal"]
-            }
+            faixa_create = FaixaCreate(
+            id_faixa=faixa_id,
+            nome_faixa=valor_faixa["nome_faixa"],
+            emocoes=valor_faixa["emocoes"],
+            duracao_ms=valor_faixa["duracao_ms"],
+            popularidade=valor_faixa["popularidade"],
+            album=valor_faixa["album"],
+            link_imagem=valor_faixa["link_imagem"],
+            letra_faixa=valor_faixa["letra"],
+            artista_principal=valor_faixa["artista_principal"],
+        )
 
-            lista_faixas_para_adicionar.append(faixa_dict)
+            lista_faixas_para_adicionar.append(faixa_create)
             
            
             rank_map[faixa_id] = {
@@ -239,15 +236,16 @@ async def salvar_top_artistas(user_id: str, access_token: str):
         lista_artistas_para_adicionar = []
         for chave, valor in top_artistas.items():
             id_artista = valor["id_artista"]
-            dict_artista = {
-                "id_artista": id_artista,
-                "nome_artista": valor["nome_artista"],
-                "popularidade_artista": valor["popularidade_artista"],
-                "link_imagem": valor["link_imagem"],
-                "generos": valor["generos"]
-            }
+            artista_create = ArtistaCreate(
+                id_artista=id_artista,
+                nome_artista=valor.get("nome_artista"),
+                popularidade_artista=valor.get("popularidade_artista"),
+                link_imagem=valor.get("link_imagem"),
+                generos=valor.get("generos")
+            )
+            
 
-            lista_artistas_para_adicionar.append(dict_artista)
+            lista_artistas_para_adicionar.append(artista_create)
 
             rank_map[id_artista] = {
             "short": valor.get("short_term_rank"), 

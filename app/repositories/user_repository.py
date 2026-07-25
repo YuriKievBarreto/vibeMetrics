@@ -1,7 +1,11 @@
 from app.models.usuario import UsuarioCreate
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.models.usuario import Usuario  
+from app.models.usuario import Usuario, UsuarioCreate, UserBasicData
+from app.models.usuario_top_faixa import UsuarioTopFaixa
+from app.models.usuario_top_artista import UsuarioTopArtista
+from app.models.faixa import Faixa
+from app.models.artista import Artista
 from datetime import datetime
 from app.core.database import async_engine
 from app.repositories.usuario_top_artista_repository import ler_usuario_top_artistas
@@ -12,13 +16,13 @@ from sqlalchemy.exc import SQLAlchemyError
 import asyncio
 
 
-async def criar_usuario(db: AsyncSession, user_data_dict):
+async def criar_usuario(db: AsyncSession, user_data: UsuarioCreate) -> Usuario | None:
 
     print("iniciandi criacao de usuaroi")
 
 
     try:
-        db_user = Usuario(**user_data_dict)
+        db_user = Usuario(**user_data.model_dump())
         db.add(db_user)
         await db.commit()
 
@@ -34,7 +38,7 @@ async def atualizar_credenciais_usuario(db: AsyncSession,
                                         user_id: str,
                                         new_access_token: str,
                                         new_refresh_token: str,
-                                        new_expires_at: datetime):
+                                        new_expires_at: datetime) -> Usuario | None:
     
 
     print("iniciando atualização de credenciais do usuario")
@@ -62,7 +66,7 @@ async def atualizar_credenciais_usuario(db: AsyncSession,
         raise e
     
 
-async def ler_usuario(user_id:str):
+async def ler_usuario(user_id:str) -> Usuario | None:
    async with AsyncSession(async_engine) as db:
         try:
             db_user = await db.get(Usuario, user_id)
@@ -79,7 +83,7 @@ async def ler_usuario(user_id:str):
         
 
 
-async def get_basic_data(spotify_user_id: str, user_db):
+async def get_basic_data(spotify_user_id: str, user_db) -> UserBasicData:
     print(f"Buscando insights para o usuário: {spotify_user_id}")
     try:
         tarefas = [
@@ -89,30 +93,30 @@ async def get_basic_data(spotify_user_id: str, user_db):
         ]
         
         
-        res_faixa_1, res_artista_1, res_artistas_20 = await asyncio.gather(*tarefas)
+        res_faixas_1, res_artistas_1, res_artistas_20 = await asyncio.gather(*tarefas)
 
-        top_faixa = res_faixa_1[0].faixa if res_faixa_1 else None
-        top_artista = res_artista_1[0].artista if res_artista_1 else None
+        top_faixa: Faixa | None = res_faixas_1[0].faixa if res_faixas_1 else None
+        top_artista: Artista | None = res_artistas_1[0].artista if res_artistas_1 else None
 
         
-        top_generos = []
+        top_generos: dict[str, int] = {}
         if res_artistas_20:
             generos_brutos = [gen for art in res_artistas_20 for gen in art.artista.generos]
             top_generos = await contar_elementos(generos_brutos)
 
-        return {
-            "nome_exibicao": user_db.nome_exibicao,
-            "top_faixa": top_faixa,
-            "top_artista": top_artista,
-            "top_generos": top_generos
-        }
+        return UserBasicData(
+            nome_exibicao=user_db.nome_exibicao,
+            top_faixa= top_faixa,
+            top_artista= top_artista,
+            top_generos=top_generos
+        )
     
     except Exception as e:
         print(f"Erro ao compilar dados básicos: {e}")
         raise e
       
 
-async def atualizar_status(spotify_user_id: str, status: str):
+async def atualizar_status(spotify_user_id: str, status: str) -> Usuario | None:
     async with AsyncSession(async_engine) as db:
         print(f"tentanto atualizar  status do usuario para : {status}")
 
@@ -141,7 +145,7 @@ async def atualizar_status(spotify_user_id: str, status: str):
 
 
 
-async def atualizar_perfil_emocional(id_usuario: str, json_perfil: dict):
+async def atualizar_perfil_emocional(id_usuario: str, json_perfil: dict) -> None:
      async with AsyncSession(async_engine) as db:
         try:
             print("atualizando perfil emocional do usuário")

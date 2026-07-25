@@ -2,6 +2,10 @@ from typing import List, Optional, Any
 from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import DateTime, JSON
+from app.models.usuario_top_artista import UsuarioTopArtista
+from app.models.artista import Artista
+from app.models.usuario_top_faixa import UsuarioTopFaixa
+from app.models.faixa import Faixa
 
 
 class Usuario(SQLModel, table=True):
@@ -39,8 +43,8 @@ class UsuarioCreate(SQLModel):
     perfil_emocional: Optional[Any] = None
 
 
-"""class UserBasicData(SQLModel):
-    "nome_exibicao": user_db.nome_exibicao,
-    "top_faixa": top_faixa,
-    "top_artista": top_artista,
-    "top_generos": top_generos"""
+class UserBasicData(SQLModel):
+    nome_exibicao: str
+    top_faixa: Faixa
+    top_artista: Artista
+    top_generos: dict[str, int]
