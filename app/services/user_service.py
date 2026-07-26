@@ -55,7 +55,15 @@ async def salvar_dados_iniciais_do_usuario(token_info: str):
         pass
 
 
-async def validar_e_renovar_credenciais(spotify_user_id: str, db: AsyncSession) -> None:
+async def validar_e_renovar_credenciais(spotify_user_id: str, db: AsyncSession | None = None) -> None:
+    if db is None:
+        async with AsyncSession(async_engine) as session:
+            await _validar_e_renovar_credenciais_impl(spotify_user_id, session)
+    else:
+        await _validar_e_renovar_credenciais_impl(spotify_user_id, db)
+
+
+async def _validar_e_renovar_credenciais_impl(spotify_user_id: str, db: AsyncSession) -> None:
     usuario = await ler_usuario(db, spotify_user_id)
     if not usuario:
         return

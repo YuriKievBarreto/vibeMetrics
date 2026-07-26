@@ -40,7 +40,7 @@ async def spotify_callback(
         value=session_token,
         httponly=True,
         secure=False,
-        samesite="Lax",
+        samesite="lax",
         max_age=43200 * 60,
         path="/"
     )

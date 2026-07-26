@@ -61,9 +61,11 @@ async def processar_callback_autenticacao(
         background_tasks.add_task(workflow_ingestao_completa, user_id, access_token)
     else:
         print("Usuário já existe — Atualizando credenciais em background")
-        background_tasks.add_task(validar_e_renovar_credenciais, user_id, db)
+        background_tasks.add_task(validar_e_renovar_credenciais, user_id)
 
     session_token = create_access_token(subject=user_id)
-    redirect_url = f"{FRONTEND_ADDRESS}/dashboard.html"
+    frontend_address = os.getenv("FRONTEND_ADDRESS", "http://127.0.0.1:5501/frontend")
+    frontend_base = frontend_address.strip().rstrip("/")
+    redirect_url = f"{frontend_base}/dashboard.html"
 
     return session_token, redirect_url
