@@ -12,10 +12,18 @@
   <img src="https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.13" />
   <img src="https://img.shields.io/badge/FastAPI-0.119-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
   <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/Docker-Enabled-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
   <img src="https://img.shields.io/badge/AI-Groq%20%2B%20Bedrock-FF4500?style=for-the-badge&logo=openai&logoColor=white" alt="AI Stack" />
   <img src="https://img.shields.io/badge/TailwindCSS-v3-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="TailwindCSS" />
 </p>
+
+---
+
+## 🔗 Links de Acesso
+
+> ⚠️ **Nota:** O Vibe Metrics é operado como um serviço em nuvem e não foi estruturado para instalação/execução local por terceiros.
+
+- 🚀 **Versão Oficial em Produção:** [<link do github pages (oficial)>](https://yurikievbarreto.github.io/spotify-analytics)
+- 🎮 **Demo Interativa (Preview Estático):** [<link do github pages (demo)>](https://yurikievbarreto.github.io/spotify-analytics/demo)
 
 ---
 
@@ -27,11 +35,6 @@
   - [3. Perfilamento Comportamental & Análise Poética](#3-perfilamento-comportamental--análise-poética)
 - [✨ Funcionalidades do Sistema](#-funcionalidades-do-sistema)
 - [🛠️ Tecnologias Utilizadas](#️-tecnologias-utilizadas)
-- [🏗️ Arquitetura e Fluxo de Dados](#️-arquitetura-e-fluxo-de-dados)
-- [🚀 Como Executar o Projeto](#-como-executar-o-projeto)
-  - [Pré-requisitos](#pré-requisitos)
-  - [Executando via Docker Compose (Recomendado)](#executando-via-docker-compose-recomendado)
-  - [Executando Localmente com `uv`](#executando-localmente-com-uv)
 - [🌐 Endpoints Principais da API](#-endpoints-principais-da-api)
 - [📂 Estrutura do Repositório](#-estrutura-do-repositório)
 - [👤 Autor](#-autor)
@@ -148,119 +151,7 @@ Além de números, a IA atua na interpretação qualitativa dos hábitos do usu�
 
 ## 🏗️ Arquitetura e Fluxo de Dados
 
-```mermaid
-flowchart TD
-    A[Usuário] -->|1. Login OAuth2| B[FastAPI Backend]
-    B -->|2. Troca de Code por Tokens| C[Spotify Web API]
-    B -->|3. Dispara Ingestão Background| D[Background Processing]
-    
-    subgraph Ingestão de Dados
-        D -->|Busca Top Tracks & Artists| C
-        D -->|Scrape Letra| E[Letras.mus.br]
-        E -- Falha -->|Fallback Letra| F[Genius API]
-        D -->|Envia Letra para Analisar| G[Provedor LLM IA]
-    end
-
-    subgraph Pipeline de IA
-        G -->|1ª Opção| H[Groq Fallback Chain]
-        H -- Rate Limit -->|2ª Opção| I[AWS Bedrock Nova]
-        G -->|Retorna Vetor 18 Emoções| J[Agregador & Perfilador]
-    end
-
-    J -->|Salva Estado Otimizado| K[(PostgreSQL Database)]
-    K -->|Consumo REST API| L[Frontend Dashboard]
-```
-
----
-
-## 🚀 Como Executar o Projeto
-
-### Pré-requisitos
-- **Docker** e **Docker Compose** instalados (método recomendado), OU
-- **Python 3.13+** e **uv** (para execução local).
-- Uma conta no [Spotify Developer Dashboard](https://developer.spotify.com/) com as credenciais `SPOTIPY_CLIENT_ID` e `SPOTIPY_CLIENT_SECRET`.
-- Chave da API do **Groq** ([Groq Console](https://console.groq.com/)) ou credenciais **AWS** com acesso ao Bedrock.
-
----
-
-### Configuração das Variáveis de Ambiente (`.env`)
-
-Crie um arquivo `.env` na raiz do projeto contendo as seguintes definições:
-
-```env
-# Spotify OAuth Credentials
-SPOTIPY_CLIENT_ID=seu_client_id_aqui
-SPOTIPY_CLIENT_SECRET=seu_client_secret_aqui
-SPOTIPY_REDIRECT_URI=http://127.0.0.1:8000/api/v1/auth/callback
-
-# Endereços da Aplicação
-DEFAULT_ADDRESS=http://127.0.0.1:8000
-FRONTEND_ADDRESS=http://127.0.0.1:5501/frontend
-
-# Banco de Dados PostgreSQL
-POSTGRES_USER=yuri
-POSTGRES_PASSWORD=sua_senha
-POSTGRES_DB=db_spotify_analytics
-DB_HOST=db  # Use 'db' para Docker ou 'localhost' para rodar fora do Docker
-DATABASE_URL=postgresql+asyncpg://yuri:sua_senha@db:5432/db_spotify_analytics
-
-# Segurança JWT
-JWT_SECRET_KEY=sua_chave_secreta_jwt
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=43200
-
-# Provedor de IA (groq ou bedrock)
-EMOTION_LLM_PROVIDER=groq
-GROQ_API_KEY=sua_chave_groq_aqui
-
-# AWS Bedrock (Opcional se usar Groq)
-AWS_ACCESS_KEY_ID=sua_aws_access_key
-AWS_SECRET_ACCESS_KEY=sua_aws_secret_key
-
-# Genius API (Letras Fallback)
-GENIUS_ACCESS_TOKEN=seu_token_genius_aqui
-```
-
----
-
-### Executando via Docker Compose (Recomendado)
-
-O projeto possui um arquivo `docker-compose.yaml` pronto com PostgreSQL e serviço FastAPI conteinerizado via `uv`.
-
-1. **Inicie os containers:**
-   ```bash
-   docker compose up -d --build
-   ```
-
-2. **Verifique os logs da aplicação:**
-   ```bash
-   docker compose logs -f app
-   ```
-
-3. **Acesse a aplicação:**
-   - Backend API: `http://localhost:8000/docs`
-   - Frontend Landing Page: `http://localhost:8000/frontend/index.html` (ou via Live Server no VSCode em `http://127.0.0.1:5501/frontend/index.html`)
-
----
-
-### Executando Localmente com `uv`
-
-Caso prefira rodar sem Docker:
-
-1. **Instale o gerenciador de pacotes `uv`:**
-   ```bash
-   pip install uv
-   ```
-
-2. **Instale as dependências do projeto:**
-   ```bash
-   uv sync
-   ```
-
-3. **Inicie o servidor de desenvolvimento:**
-   ```bash
-   uv run uvicorn app.main:app --reload --port 8000
-   ```
+> ⚠️ *Diagrama de arquitetura temporariamente indisponível para atualização.*
 
 ---
 
