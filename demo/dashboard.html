@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vibe Metrics - Dashboard (Demo)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg">
+</head>
+
+<body class="bg-gray-950 text-white h-screen">
+
+  <!-- ==================== LOADING (desativado na demo) ==================== -->
+  <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center gap-4 z-50">
+    <div class="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+    <p class="text-gray-300 text-lg">Carregando...</p>
+  </div>
+
+  <!-- Mobile Header -->
+  <header class="w-full bg-gray-900 px-6 py-4 flex items-center justify-between border-b border-gray-800 md:hidden">
+    <div class="flex items-center gap-2">
+      <img 
+        src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" 
+        alt="logo" 
+        class="w-6 h-6"
+      >
+      <h1 class="text-xl font-semibold">Vibe Metrics - Spotify</h1>
+    </div>
+
+    <button id="mobileMenu" class="text-white text-2xl">☰</button>
+  </header>
+
+  <!-- LAYOUT -->
+  <div class="flex h-full">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-900 flex flex-col p-6 border-r border-gray-800 hidden md:flex">
+      <div class="flex items-center gap-2 mb-10">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="logo" class="w-6 h-6">
+        <h1 class="text-xl font-semibold">Vibe Metrics - Demo</h1>
+      </div>
+
+      <nav class="flex flex-col gap-4">
+        <a href="#" class="text-green-500 hover:text-green-500 transition">🎧 Visão Geral</a>
+        <a href="artistas.html" class="text-gray-300 hover:text-green-500 transition">👥 Artistas</a>
+        <a href="musicas.html" class="text-gray-300 hover:text-green-500 transition">🎵 Músicas</a>
+        <a href="emocoes.html" class="text-gray-300 hover:text-green-500 transition">🎭 Emoções</a>
+      </nav>
+
+      <div class="mt-auto">
+        <button class="w-full bg-green-500 text-black font-semibold py-2 rounded-full mt-10 cursor-not-allowed opacity-50">
+          Sair (Desativado)
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 overflow-y-auto p-6 md:p-10">
+
+      <!-- Header -->
+      <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
+        <div>
+          <h2 id="userName" class="text-3xl font-bold">Olá, Kiev👋</h2>
+          <p class="text-gray-400">Aqui está um resumo do seu perfil musical</p>
+        </div>
+      </header>
+
+      <!-- Navigation Buttons -->
+      <section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+
+        <a href="artistas.html" class="bg-green-500 text-black font-semibold py-6 rounded-2xl shadow-lg flex items-center justify-center transition">
+          👥 Ver Artistas
+        </a>
+
+        <a href="musicas.html" class="bg-green-500 text-black font-semibold py-6 rounded-2xl shadow-lg flex items-center justify-center transition">
+          🎵 Ver Músicas
+        </a>
+
+        <a href="emocoes.html" class="relative bg-green-500 text-black font-semibold py-6 rounded-2xl shadow-lg flex flex-col items-center justify-center transition">
+          🎭 Análise de Emoções
+          <span class="absolute -top-2 -right-2 bg-yellow-400 text-black px-2 py-1 text-xs font-bold rounded-full shadow-md ">
+            ⚡ AI Powered
+          </span>
+        </a>
+
+      </section>
+
+      <!-- Cards + Chart -->
+      <section class="grid lg:grid-cols-3 gap-10">
+
+        <!-- Card: Música mais ouvida recentemente -->
+        <div class="bg-gray-900 p-6 rounded-2xl shadow-lg flex flex-col items-center justify-center text-center">
+          <img src="https://i.scdn.co/image/ab67616d00001e024a67d6a2fea7ec3958232f98" class="w-32 h-32 rounded-xl mb-4">
+          <h3 class="text-lg font-semibold mb-1">Música mais ouvida recentemente</h3>
+          <p class="text-2xl font-bold text-green-500">Céu azul</p>
+          <p class="text-gray-400 mt-1">Charlie Brown jr</p>
+        </div>
+
+        <!-- Card: Artista mais ouvido recentemente -->
+        <div class="bg-gray-900 p-6 rounded-2xl shadow-lg flex flex-col items-center justify-center text-center">
+          <img src="https://i.scdn.co/image/ab6761610000517467bc48f32d1cc16497865361" class="w-32 h-32 rounded-full mb-4">
+          <h3 class="text-lg font-semibold mb-1">Artista mais ouvido recentemente</h3>
+          <p class="text-2xl font-bold text-green-500">Charlie Brown Jr.</p>
+          <p class="text-gray-400 mt-1">Gênero: brazilian rock</p>
+        </div>
+
+        <!-- Gráfico -->
+        <div class="bg-gray-900 p-6 rounded-2xl shadow-lg">
+          <h3 class="text-lg font-semibold mb-4">Distribuição de Gêneros</h3>
+          <canvas id="genreChart"></canvas>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div> <!-- fim layout -->
+
+  <!-- ========================== SCRIPT DO GRÁFICO ========================== -->
+  <script>
+    const ctx = document.getElementById('genreChart').getContext('2d');
+
+    // Top 4 gêneros ordenados
+    const labels = ["reggae", "mpb", "brazilian hip hop", "brazilian pop"];
+    const valores = [13, 11, 11, 9];
+
+    new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: labels,
+        datasets: [{
+          data: valores,
+          backgroundColor: ["#22c55e", "#3b82f6", "#a855f7", "#ef4444"]
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { labels: { color: "#fff" } }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

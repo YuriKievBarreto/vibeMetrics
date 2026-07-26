@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vibe Metrics | Em Construção</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg">
+</head>
+<body class="bg-gray-950 text-white font-sans min-h-screen flex flex-col justify-between">
+
+  <nav class="flex justify-between items-center px-6 py-4 border-b border-gray-800 bg-gray-950">
+    <div class="flex items-center gap-2">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="logo" class="w-7 h-7">
+      <h1 class="text-xl font-semibold italic">Vibe Metrics</h1>
+    </div>
+  </nav>
+
+  <main class="flex-grow flex flex-col items-center justify-center text-center px-6">
+    <div class="mb-8">
+        <span class="bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-4 py-2 rounded-full text-sm font-bold uppercase tracking-widest animate-pulse">
+            🚧 Em Desenvolvimento
+        </span>
+    </div>
+
+    <h2 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+      Estamos afinando os <span class="text-green-500">instrumentos</span>.
+    </h2>
+    
+    <p class="text-gray-400 max-w-xl mb-12 text-lg">
+      O <strong>Vibe Metrics</strong> está passando por uma manutenção na integração com a AWS para garantir que sua análise de IA seja perfeita. 
+      <br><br>
+      A versão com conexão ao Spotify estará disponível em breve!
+    </p>
+
+    <div class="flex flex-col md:flex-row gap-4 w-full max-w-md">
+      <a href="landingPage.html" class="flex-1 bg-white text-black hover:bg-gray-200 font-bold py-4 rounded-xl transition duration-300 text-center">
+        Acessar Versão Demo
+      </a>
+      <a href="https://github.com/YuriKievBarreto/vibeMetrics" target="_blank" class="flex-1 border border-gray-700 hover:bg-gray-900 text-white font-bold py-4 rounded-xl transition duration-300 text-center">
+        Ver no GitHub
+      </a>
+    </div>
+
+    <div class="mt-12 flex items-center gap-4 text-gray-600">
+        <div class="flex flex-col items-center">
+            <span class="text-xs uppercase">Backend</span>
+            <span class="font-mono text-green-500/50">AWS EC2 ●</span>
+        </div>
+        <div class="h-8 w-[1px] bg-gray-800"></div>
+        <div class="flex flex-col items-center">
+            <span class="text-xs uppercase">Database</span>
+            <span class="font-mono text-green-500/50">PostgreSQL ●</span>
+        </div>
+        <div class="h-8 w-[1px] bg-gray-800"></div>
+        <div class="flex flex-col items-center">
+            <span class="text-xs uppercase">AI Engine</span>
+            <span class="font-mono text-green-500/50">Bedrock ●</span>
+        </div>
+    </div>
+  </main>
+
+  <footer class="border-t border-gray-800 text-center py-8 text-gray-500 text-sm">
+    © 2026 Vibe Metrics — Desenvolvido por <strong>Yuri Kiev</strong>
+  </footer>
+
+</body>
+</html>

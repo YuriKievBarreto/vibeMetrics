@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Análise de Emoções - Vibe Metrics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        /* Definição de Gradientes (Para o JS usar na barra) */
+        .gradient-blue-purple { background-image: linear-gradient(to right, #6366f1, #9333ea); }
+        .gradient-yellow-orange { background-image: linear-gradient(to right, #fbbf24, #f97316); }
+    </style>
+</head>
+
+<body class="bg-gray-950 text-white h-screen flex flex-col md:flex-row">
+
+    <header class="w-full bg-gray-900 px-6 py-4 flex items-center justify-between border-b border-gray-800 md:hidden">
+        <div class="flex items-center gap-2">
+            <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" 
+                alt="logo" 
+                class="w-6 h-6"
+            >
+            <h1 class="text-xl font-semibold">Vibe Metrics - Spotify</h1>
+        </div>
+        <button id="mobileMenu" class="text-white text-2xl">☰</button>
+    </header>
+
+    <aside class="w-64 bg-gray-900 flex flex-col p-6 border-r border-gray-800 hidden md:flex shrink-0">
+        <div class="flex items-center gap-2 mb-10 cursor-pointer" onclick="window.location.href='/'">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="logo" class="w-6 h-6">
+            <h1 class="text-xl font-semibold">Spotify Analytics</h1>
+        </div>
+
+        <nav class="flex flex-col gap-4">
+            <a href="dashboard.html" class="text-gray-300 hover:text-green-500 transition">🎧 Visão Geral</a>
+            <a href="artistas.html" class="text-gray-300 hover:text-green-500 transition">👥 Artistas</a>
+            <a href="musicas.html" class="text-gray-300 hover:text-green-500 transition">🎵 Músicas</a>
+            <a href="emocoes.html" class="text-green-500 font-bold transition border-l-4 border-green-500 pl-2">🧠 Emoções IA</a>
+        </nav>
+
+        <div class="mt-auto">
+            <button id="logoutButton" class="w-full bg-green-500 hover:bg-green-600 text-black font-semibold py-2 rounded-full mt-10 transition">Sair</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-4 md:p-10">
+        
+        <header class="mb-6 animate-fadeIn">
+            <h2 class="text-2xl md:text-4xl font-bold mb-1">Emoções em Pauta 🧠</h2>
+            <p class="text-gray-400 text-sm md:text-lg">Como suas músicas moldam sua visão de mundo.</p>
+        </header>
+
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 animate-fadeIn" style="animation-delay: 0.2s;">
+            
+            <div id="top1SentimentCard" class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-lg font-bold text-blue-400">Melancolia 😔</h3>
+                    <span class="text-gray-500 text-xs bg-gray-800 px-2 py-1 rounded">Top 1</span>
+                </div>
+                <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
+                    <div class="gradient-blue-purple h-full rounded-full" style="width: 85%;"></div>
+                </div>
+                <p class="text-gray-500 text-[10px] mt-1 text-right">85% Intensidade</p>
+            </div>
+
+            <div id="top2SentimentCard" class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-lg font-bold text-yellow-400">Alegria 😄</h3>
+                    <span class="text-gray-500 text-xs bg-gray-800 px-2 py-1 rounded">Top 2</span>
+                </div>
+                <div class="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
+                    <div class="gradient-yellow-orange h-full rounded-full" style="width: 70%;"></div>
+                </div>
+                <p class="text-gray-500 text-[10px] mt-1 text-right">70% Intensidade</p>
+            </div>
+
+            <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 shadow-lg flex items-center justify-between">
+                <div>
+                    <p class="text-gray-400 text-xs uppercase font-bold">Mais Frequente</p>
+                    <p id="frequentEmotionText" class="text-2xl font-extrabold text-white-400 mt-1">Paz</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-gray-500">Presente em</p>
+                    <p id="frequentEmotionCount" class="text-sm font-bold text-white">20 faixas</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="profileTextSection" class=" mb-6 bg-gradient-to-br from-gray-900 to-gray-800 p-5 rounded-2xl border border-gray-700 shadow-xl animate-fadeIn" style="animation-delay: 0.4s;">
+            
+            <div class="flex items-center gap-2 mb-2">
+                <span class="bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded shadow">IA Analysis</span>
+                <h3 class="text-lg font-bold text-white">Seu Perfil Emocional</h3>
+            </div>
+
+            <div class="prose prose-invert prose-sm max-w-none text-gray-300 leading-relaxed text-sm">
+                <p id="emotionProfileText">
+                    Carregando análise do seu perfil emocional...
+                </p>
+            </div>
+        </section>
+        
+        <section id="top1DetailedAnalysis" class="mb-6 animate-fadeIn" style="animation-delay: 0.6s;">
+            <div class="bg-gray-900 p-5 rounded-2xl border border-blue-600 shadow-xl flex flex-col md:flex-row gap-5">
+                
+                <div class="md:w-1/3 flex flex-col items-center text-center">
+                    <img id="top1TrackImage"
+                        src="https://i.scdn.co/image/ab67616d00001e024d72c2d8dbe8a618bb164371" 
+                        alt="Capa do Álbum" 
+                        class="w-32 h-32 md:w-48 md:h-48 rounded-lg shadow-lg mb-3"
+                    >
+                    <p id="top1TrackName" class="text-lg font-bold text-white">A Morte do Autotune</p>
+                    <p id="top1ArtistName" class="text-sm text-gray-400">Matue</p>
+                    <p id="top1TrackHighlight" class="text-xs text-blue-400 font-semibold mt-1">
+                        Destaque em Autoafirmação (57%)
+                    </p>
+                </div>
+                
+                <div class="md:w-2/3 flex flex-col justify-center">
+                    <h3 id="top1AnalysisTitle" class="text-xl font-bold text-white mb-3 border-b border-gray-700 pb-1">Análise da Faixa Mais Autoafirmativa</h3>
+                    
+                    <blockquote class="border-l-4 border-blue-400 pl-4 py-2 my-3 bg-gray-950/50 rounded">
+                        <p id="top1Citation" class="italic text-gray-300">
+                            "Eu não sei pra onde ir. Sinto um vazio por dentro. Me escondo pra fugir desse sentimento."
+                        </p>
+                    </blockquote>
+                    
+                    <p id="top1Explanation" class="text-sm text-gray-400 mt-2 leading-relaxed">
+                        Este trecho demonstra autoafirmação, pois o artista se posiciona firmemente contra aqueles que criticam seu estilo, reafirmando sua confiança em seu próprio trabalho.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="top2DetailedAnalysis" class="mb-6 animate-fadeIn" style="animation-delay: 0.8s;">
+            <div class="bg-gray-900 p-5 rounded-2xl border border-yellow-500 shadow-xl flex flex-col md:flex-row gap-5">
+                
+                <div class="md:w-1/3 flex flex-col items-center text-center">
+                    <img id="top2TrackImage"
+                        src="https://i.scdn.co/image/ab67616d00001e02c66ac5cd78aa8a25223e0dcb" 
+                        alt="Capa do Álbum" 
+                        class="w-32 h-32 md:w-48 md:h-48 rounded-lg shadow-lg mb-3"
+                    >
+                    <p id="top2TrackName" class="text-lg font-bold text-white">KGL's</p>
+                    <p id="top2ArtistName" class="text-sm text-gray-400">Filipe Ret</p>
+                    <p id="top2TrackHighlight" class="text-xs text-yellow-400 font-semibold mt-1">
+                        Destaque em Alegria (70%)
+                    </p>
+                </div>
+                
+                <div class="md:w-2/3 flex flex-col justify-center">
+                    <h3 id="top2AnalysisTitle" class="text-xl font-bold text-white mb-3 border-b border-gray-700 pb-1">Análise da Faixa Mais Alegre</h3>
+                    
+                    <blockquote class="border-l-4 border-yellow-400 pl-4 py-2 my-3 bg-gray-950/50 rounded">
+                        <p id="top2Citation" class="italic text-gray-300">
+                            "Tenho, mais motivos pra sorrir e agradecer Do que pra chorar e desistir"
+                        </p>
+                    </blockquote>
+                    
+                    <p id="top2Explanation" class="text-sm text-gray-400 mt-2 leading-relaxed">
+                        Este verso expressa uma perspectiva positiva e uma atitude de gratidão, que se alinha com a emoção de alegria.
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <script>
+        // ============================================================
+        // CONFIGURAÇÃO E FUNÇÕES DE UTILIDADE
+        // ============================================================
+        const API_PERFIL_MUSICAL_URL = "http://127.0.0.1:8000/api/v1/user/perfil-musical";
+        const HOME_URL = "/";
+
+        // Mapeamento de Emoções para cores e emojis
+        const EMOTION_MAP = {
+            'autoafirmacao': { color: 'blue', emoji: '💪', gradient: 'gradient-blue-purple' },
+            'alegria': { color: 'yellow', emoji: '😄', gradient: 'gradient-yellow-orange' },
+            'paz': { color: 'white', emoji: '🕊️', gradient: 'bg-white' },
+            'tristeza': { color: 'indigo', emoji: '😔', gradient: 'bg-indigo-700' },
+            'melancolia': { color: 'indigo', emoji: '😥', gradient: 'bg-indigo-700' },
+            'default': { color: 'gray', emoji: '📊', gradient: 'bg-gray-700' }
+        };
+
+        function capitalize(str) {
+            if (!str) return 'Desconhecido';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // ============================================================
+        // LÓGICA DE POPULAÇÃO DOS BLOCOS
+        // ============================================================
+
+        function populateTopSentimentCard(cardElementId, analysisSectionId, sentimentData, rank) {
+            const data = sentimentData;
+            const meta = EMOTION_MAP[data.nome.toLowerCase()] || EMOTION_MAP.default;
+            const intensityPercent = Math.round(data.intensidade * 100);
+            const color = meta.color;
+            const gradientClass = meta.gradient;
+            const faixa = data.faixa;
+            const analise = faixa.analise;
+            
+            // --- 1. Atualizar o Mini-Card (TOPO) ---
+            const card = document.getElementById(cardElementId);
+            if (card) {
+                card.querySelector('h3').innerHTML = `${capitalize(data.nome)} ${meta.emoji}`;
+                card.querySelector('h3').className = `text-lg font-bold text-${color}-400`;
+                card.querySelector('.text-gray-500.text-xs').textContent = `Top ${rank}`;
+                card.querySelector('.text-gray-500.text-\\[10px\\]').textContent = `${intensityPercent}% Intensidade`;
+
+                const gradientDiv = card.querySelector('.w-full > div');
+                if (gradientDiv) {
+                    gradientDiv.style.width = `${intensityPercent}%`;
+                    
+                    // Remove classes de gradiente antigas e aplica a nova
+                    gradientDiv.classList.remove('gradient-blue-purple', 'gradient-yellow-orange', 'bg-indigo-700', 'bg-purple-700'); 
+                    gradientDiv.classList.add(gradientClass);
+                }
+            }
+            
+            // --- 2. Atualizar o Bloco de Análise Detalhada (ABAIXO) ---
+            const section = document.getElementById(analysisSectionId);
+            if (section) {
+                const innerDiv = section.querySelector('.bg-gray-900');
+                
+                // Atualiza a borda e background da seção
+                innerDiv.className = `bg-gray-900 p-5 rounded-2xl border border-${color}-500 shadow-xl flex flex-col md:flex-row gap-5`;
+
+                // Coluna da Esquerda (Capa e Títulos)
+                section.querySelector('#top' + rank + 'TrackImage').src = faixa.link_imagem;
+                section.querySelector('#top' + rank + 'TrackImage').alt = `Capa do Álbum ${faixa.album}`;
+                section.querySelector('#top' + rank + 'TrackName').textContent = faixa.nome_faixa;
+                section.querySelector('#top' + rank + 'ArtistName').textContent = faixa.artista_principal;
+                
+                const highlightText = section.querySelector('#top' + rank + 'TrackHighlight');
+                highlightText.textContent = `Destaque em ${capitalize(data.nome)} (${intensityPercent}%)`;
+                highlightText.className = `text-xs text-${color}-400 font-semibold mt-1`;
+
+
+                // Coluna da Direita (Análise)
+                section.querySelector('#top' + rank + 'AnalysisTitle').textContent = `Análise da Faixa Mais Forte Em ${capitalize(data.nome)}`;
+
+                const blockquote = section.querySelector('blockquote');
+                blockquote.querySelector('p').textContent = `"${analise.citacao}"`;
+                blockquote.className = `border-l-4 border-${color}-400 pl-4 py-2 my-3 bg-gray-950/50 rounded`;
+                
+                section.querySelector('#top' + rank + 'Explanation').textContent = analise.explicacao;
+            }
+        }
+
+
+        // ============================================================
+        // FUNÇÃO PRINCIPAL DE CARREGAMENTO
+        // ============================================================
+        async function loadEmotionData() {
+            const profileTextContainer = document.getElementById('emotionProfileText');
+            if (profileTextContainer) profileTextContainer.textContent = 'Aguardando análise de perfil...';
+
+            try {
+                const response = await fetch("./emocoes.json");
+
+                if (response.status === 401) {
+                    window.location.href = HOME_URL; 
+                    return;
+                }
+                if (!response.ok) throw new Error("Falha ao buscar dados do perfil emocional.");
+
+                const data = await response.json();
+                
+                
+                // 1. Preencher Cartão TOP 1 (Mini-Card + Seção Detalhada 3)
+                populateTopSentimentCard('top1SentimentCard', 'top1DetailedAnalysis', data.top1_sentimento, 1);
+                
+                // 2. Preencher Cartão TOP 2 (Mini-Card + Seção Detalhada 4)
+                populateTopSentimentCard('top2SentimentCard', 'top2DetailedAnalysis', data.top2_sentimento, 2);
+                
+                // 3. Preencher o Texto do Perfil Emocional
+                if (profileTextContainer) {
+                    profileTextContainer.textContent = data.texto_perfil_emocional;
+                }
+                
+            } catch(e) {
+                console.error("Erro ao carregar dados do perfil:", e);
+                if (profileTextContainer) profileTextContainer.textContent = 'Falha ao conectar e carregar dados. Verifique a API.';
+            }
+        }
+
+        // ============================================================
+        // EVENT LISTENERS E INICIALIZAÇÃO
+        // ============================================================
+        
+        // Lógica de Logout
+        const logoutButton = document.getElementById("logoutButton");
+        if (logoutButton) {
+            logoutButton.addEventListener("click", async () => {
+                try {
+                    await fetch("http://127.0.0.1:8000/api/v1/user/logout", { method: 'POST', credentials: 'include' });
+                    window.location.href = HOME_URL;
+                } catch(e) { window.location.href = HOME_URL; }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadEmotionData);
+    </script>
+
+
+</body>
+</html>

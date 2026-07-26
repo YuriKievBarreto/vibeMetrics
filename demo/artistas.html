@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seus Artistas - Vibe Metrics - Spotify</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg">
+</head>
+
+<body class="bg-gray-950 text-white h-screen flex flex-col md:flex-row">
+
+    <header class="w-full bg-gray-900 px-6 py-4 flex items-center justify-between border-b border-gray-800 md:hidden">
+    <div class="flex items-center gap-2">
+      <img 
+        src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" 
+        alt="logo" 
+        class="w-6 h-6"
+        >
+      <h1 class="text-xl font-semibold">Vibe Metrics - Spotify</h1>
+    </div>
+
+    <button id="mobileMenu" class="text-white text-2xl">☰</button>
+  </header>
+
+  <aside class="w-64 bg-gray-900 flex flex-col p-6 border-r border-gray-800 hidden md:flex shrink-0">
+    <div class="flex items-center gap-2 mb-10 cursor-pointer" onclick="window.location.href='/'">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="logo" class="w-6 h-6">
+      <h1 class="text-xl font-semibold">Vibe Metrics - Spotify</h1>
+    </div>
+
+    <nav class="flex flex-col gap-4">
+      <a href="dashboard.html" class="text-gray-300 hover:text-green-500 transition">🎧 Visão Geral</a>
+      <a href="artistas.html" class="text-green-500 font-bold transition border-l-4 border-green-500 pl-2">👥 Artistas</a>
+      <a href="musicas.html" class="text-gray-300 hover:text-green-500 transition">🎵 Músicas</a>
+      <a href="emocoes.html" class="text-gray-300 hover:text-green-500 transition">🎭 Emoções</a>
+    </nav>
+
+    <div class="mt-auto">
+      <button id="logoutButton" class="w-full bg-green-500 hover:bg-green-600 text-black font-semibold py-2 rounded-full mt-10 transition">Sair</button>
+    </div>
+  </aside>
+
+  <main class="flex-1 overflow-y-auto p-6 md:p-10">
+    
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+  
+        <div>
+            <h2 class="text-2xl md:text-3xl font-bold mb-1">Seus Artistas Favoritos 🎤</h2>
+            <p class="text-gray-400 text-sm md:text-base">Descubra quem domina seus fones de ouvido.</p>
+        </div>
+        
+        <div id="timeFilters" class="flex bg-gray-800 rounded-lg p-1 self-start md:self-auto shadow-sm">
+            
+            <button class="time-btn px-3 py-1 md:px-4 rounded font-medium text-xs md:text-sm transition cursor-pointer
+                        bg-green-500 text-black shadow"> 4 Semanas
+            </button>
+
+            <button class="time-btn px-3 py-1 md:px-4 rounded font-medium text-xs md:text-sm transition cursor-pointer
+                        text-gray-400 hover:text-white"> 6 Meses
+            </button>
+
+            <button class="time-btn px-3 py-1 md:px-4 rounded font-medium text-xs md:text-sm transition cursor-pointer
+                        text-gray-400 hover:text-white"> Tudo
+            </button>
+
+        </div>
+
+    </header>
+
+    <section class="grid md:grid-cols-3 gap-6 mb-10">
+      
+      <div class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 relative overflow-hidden">
+        <div class="absolute top-0 right-0 bg-green-500 text-black font-bold px-3 py-1 rounded-bl-xl">#1</div>
+        <div class="absolute top-0 right-0 bg-green-500 text-black font-bold px-3 py-1 rounded-bl-xl" id="topArtistRankBadge">#1</div>
+<div class="w-24 h-24 rounded-full bg-gray-700 mb-4 ring-4 ring-green-500 ring-opacity-50 animate-pulse" id="topArtistImagePlaceholder"></div>
+<h3 class="text-xl font-bold text-white" id="topArtistNameDisplay">Carregando...</h3>
+      </div>
+
+      <div class="bg-gray-900 p-6 rounded-2xl shadow-lg border border-gray-800 md:col-span-2">
+        <h3 class="text-lg font-semibold mb-4 text-gray-300">Gêneros Principais</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 bg-blue-900 text-blue-200 rounded-full text-sm border border-blue-700">Pop Rock</span>
+          <span class="px-3 py-1 bg-purple-900 text-purple-200 rounded-full text-sm border border-purple-700">Trap Brasileiro</span>
+          <span class="px-3 py-1 bg-yellow-900 text-yellow-200 rounded-full text-sm border border-yellow-700">Reggae</span>
+          <span class="px-3 py-1 bg-red-900 text-red-200 rounded-full text-sm border border-red-700">MPB</span>
+          <span class="px-3 py-1 bg-green-900 text-green-200 rounded-full text-sm border border-green-700">Indie</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h3 class="text-2xl font-bold mb-6 border-l-4 border-green-500 pl-3">Ranking Detalhado</h3>
+      
+      <div id="artistGridContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        
+        <div class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition duration-300 group cursor-pointer border border-transparent hover:border-gray-700">
+          <div class="relative mb-4">
+            <img src="https://placehold.co/300x300/1f2937/white?text=Artist" alt="Artist" class="w-full h-48 object-cover rounded-lg shadow-md group-hover:scale-105 transition duration-500">
+            <span class="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs font-bold px-2 py-1 rounded-md backdrop-blur-sm">#2</span>
+          </div>
+          <h4 class="text-lg font-bold text-white truncate">Nome do Artista</h4>
+          <p class="text-sm text-gray-400 mb-3 truncate">Gênero Principal</p>
+          
+          <div class="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden">
+            <div class="bg-green-500 h-full" style="width: 85%"></div> </div>
+          <p class="text-xs text-right text-gray-500 mt-1">85% Popularidade</p>
+        </div>
+
+        <div class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition duration-300 group cursor-pointer border border-transparent hover:border-gray-700">
+            <div class="relative mb-4">
+              <img src="https://placehold.co/300x300/1f2937/white?text=Artist" alt="Artist" class="w-full h-48 object-cover rounded-lg shadow-md group-hover:scale-105 transition duration-500">
+              <span class="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs font-bold px-2 py-1 rounded-md backdrop-blur-sm">#3</span>
+            </div>
+            <h4 class="text-lg font-bold text-white truncate">Outro Artista</h4>
+            <p class="text-sm text-gray-400 mb-3 truncate">Rock</p>
+            <div class="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden">
+              <div class="bg-green-500 h-full" style="width: 70%"></div>
+            </div>
+            <p class="text-xs text-right text-gray-500 mt-1">70% Popularidade</p>
+          </div>
+
+      </div>
+    </section>
+
+  </main>
+
+ <script>
+    // ============================================================
+    // CONFIGURAÇÃO E VARIÁVEIS GLOBAIS
+    // ============================================================
+    const API_ARTISTS_URL = "http://127.0.0.1:8000/api/v1/user/top-artistas";
+    const LOGOUT_URL = "http://127.0.0.1:8000/api/v1/user/logout";
+    const HOME_URL = "/";
+    
+    // Variável global para armazenar os dados crus do Backend
+    let allArtistsData = []; 
+    let currentRankKey = 'short_rank'; // Estado inicial
+
+    // Mapeamento das chaves de rank (deve coincidir com o JSON)
+    const rankMap = ['short_rank', 'medium_rank', 'long_rank'];
+
+    // Seletores DOM
+    const filterButtons = document.querySelectorAll('.time-btn');
+    const artistGridContainer = document.getElementById('artistGridContainer'); // ID adicionado no HTML
+    
+    // Elementos do Card de Destaque
+    const topCardContainer = document.querySelector('.bg-green-500').closest('div.bg-gray-900');
+    const topArtistRankBadge = document.getElementById('topArtistRankBadge');
+    const topArtistImagePlaceholder = document.getElementById('topArtistImagePlaceholder');
+    const topArtistNameDisplay = document.getElementById('topArtistNameDisplay');
+    const genreTagContainer = document.querySelector('.flex.flex-wrap.gap-2'); // Container de tags de gênero
+    
+    // Classes CSS
+    const activeClasses = ['bg-green-500', 'text-black', 'shadow'];
+    const inactiveClasses = ['text-gray-400', 'hover:text-white'];
+
+
+    // ============================================================
+    // FUNÇÕES DE UTILIDADE E RENDERIZAÇÃO
+    // ============================================================
+    
+    // Renderiza as tags de gênero (limpa os mockups existentes)
+    function renderGenreTags(genres) {
+        genreTagContainer.innerHTML = ''; // Limpa as tags mockups
+        if (!genres || genres.length === 0) {
+            genreTagContainer.innerHTML = '<span class="text-gray-500 text-sm">Gêneros não classificados.</span>';
+            return;
+        }
+
+        const MAX_TAGS = 6;
+        genres.slice(0, MAX_TAGS).forEach(genre => {
+            // Mapeia a cor com base no hash do nome do gênero para consistência visual
+            const hash = genre.length % 5;
+            const colorMap = ['blue', 'purple', 'yellow', 'red', 'green'];
+            const color = colorMap[hash];
+
+            const tag = `
+                <span class="px-3 py-1 bg-${color}-900 text-${color}-200 rounded-full text-sm border border-${color}-700">
+                    ${genre.toUpperCase()}
+                </span>
+            `;
+            genreTagContainer.innerHTML += tag;
+        });
+    }
+
+    // Cria o card HTML para um artista na grid
+    function createArtistCardHTML(artist, rank) {
+        const primaryGenre = artist.generos[0] || 'Gênero não informado';
+        const popularidade = artist.popularidade_artista || 0;
+
+        return `
+            <div class="bg-gray-900 rounded-xl p-4 hover:bg-gray-800 transition duration-300 group cursor-pointer border border-transparent hover:border-gray-700">
+                <div class="relative mb-4">
+                    <img src="${artist.link_imagem || 'https://placehold.co/300x300/1f2937/white?text=Artist'}" 
+                         alt="${artist.nome_artista}" 
+                         class="w-full h-48 object-cover rounded-lg shadow-md group-hover:scale-105 transition duration-500 bg-gray-800">
+                    
+                    <span class="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs font-bold px-2 py-1 rounded-md backdrop-blur-sm">
+                        #${rank}
+                    </span>
+                </div>
+                
+                <h4 class="text-lg font-bold text-white truncate">${artist.nome_artista}</h4>
+                <p class="text-sm text-gray-400 mb-3 truncate">${primaryGenre}</p>
+                
+                <div class="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-green-500 h-full" style="width: ${popularidade}%"></div> 
+                </div>
+                <p class="text-xs text-right text-gray-500 mt-1">${popularidade}% Popularidade</p>
+            </div>
+        `;
+    }
+
+    // Atualiza o card de destaque (o card grande no topo)
+    function renderTopCard(artist, rank) {
+        if (!artist) {
+            topArtistNameDisplay.textContent = 'Nenhum Artista Top';
+            return;
+        }
+
+        topArtistRankBadge.textContent = `#${rank}`;
+        topArtistNameDisplay.textContent = artist.nome_artista;
+        topArtistImagePlaceholder.classList.remove('animate-pulse');
+        topArtistImagePlaceholder.style.backgroundImage = `url(${artist.link_imagem})`;
+        topArtistImagePlaceholder.style.backgroundSize = 'cover';
+        topArtistImagePlaceholder.style.backgroundPosition = 'center';
+        topArtistImagePlaceholder.src = artist.link_imagem; // Define a imagem
+    }
+
+
+    // ============================================================
+    // LÓGICA DE FILTRAGEM E RENDERIZAÇÃO
+    // ============================================================
+
+    function renderFilteredArtists(rankKey) {
+        artistGridContainer.innerHTML = "";
+        
+        // 1. Filtra: Pega apenas os artistas que tem rank nesse período (não nulos)
+        const filteredArtists = allArtistsData.filter(artist => artist[rankKey] !== null);
+
+        // 2. Ordena: Garante que o rank 1 apareça primeiro, depois o 2, etc.
+        filteredArtists.sort((a, b) => a[rankKey] - b[rankKey]);
+
+        if (filteredArtists.length === 0) {
+            artistGridContainer.innerHTML = '<div class="p-10 text-center text-gray-500 md:col-span-4">Nenhum artista favorito encontrado neste período.</div>';
+            return;
+        }
+
+        // 3. Atualiza o Card de Destaque (#1)
+        const topArtist = filteredArtists[0];
+        renderTopCard(topArtist, topArtist[rankKey]);
+        renderGenreTags(topArtist.generos);
+
+        // 4. Renderiza a Grid (excluindo o item #1, pois ele está em destaque)
+        filteredArtists.slice(1).forEach(artist => {
+            const rankNumber = artist[rankKey];
+            artistGridContainer.innerHTML += createArtistCardHTML(artist, rankNumber);
+        });
+    }
+
+    // ============================================================
+    // CARREGAMENTO INICIAL
+    // ============================================================
+    async function loadInitialData() {
+        // Mockup de carregamento inicial
+        if(topArtistNameDisplay) topArtistNameDisplay.textContent = 'Carregando...';
+
+        try {
+            const response = await fetch("./artistas.json");
+
+            if (response.status === 401) {
+                // Se a sessão expirou, redireciona para login (rota raiz que deve iniciar o OAuth)
+                window.location.href = HOME_URL; 
+                return;
+            }
+            if (!response.ok) throw new Error("Falha ao buscar dados na API.");
+
+            const data = await response.json();
+            
+            
+            // 1. SALVA DADOS GLOBAIS
+            allArtistsData = data || [];
+
+            // 2. RENDERIZA A VISÃO PADRÃO (4 Semanas / short_rank)
+            renderFilteredArtists(currentRankKey); 
+
+        } catch (error) {
+            console.error("Erro de carregamento:", error);
+            if(topArtistNameDisplay) topArtistNameDisplay.textContent = 'Erro ao conectar.';
+            artistGridContainer.innerHTML = '<div class="p-10 text-center text-red-500 md:col-span-4">Falha crítica ao carregar dados.</div>';
+        }
+    }
+
+
+    // ============================================================
+    // EVENT LISTENERS
+    // ============================================================
+    
+    // Logout Logic
+    if (logoutButton) {
+        logoutButton.addEventListener("click", async () => {
+            try { await fetch(LOGOUT_URL, { method: 'POST', credentials: 'include' }); } 
+            catch(e) {}
+            window.location.href = HOME_URL;
+        });
+    }
+
+    // Filtros de Tempo (Lógica de Troca de Dados)
+    filterButtons.forEach((button, index) => {
+        button.addEventListener('click', () => {
+            // 1. Atualiza Visual dos Botões
+            filterButtons.forEach(btn => {
+                btn.classList.remove(...activeClasses);
+                btn.classList.add(...inactiveClasses);
+            });
+            button.classList.remove(...inactiveClasses);
+            button.classList.add(...activeClasses);
+
+            // 2. Mapeia a chave de rank (0 -> short_rank, 1 -> medium_rank, 2 -> long_rank)
+            currentRankKey = rankMap[index];
+            
+            // 3. Atualiza a lista
+            renderFilteredArtists(currentRankKey);
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", loadInitialData);
+  </script>
+
+</body>
+</html>
