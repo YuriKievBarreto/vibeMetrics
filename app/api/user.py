@@ -61,7 +61,7 @@ async def get_user_basic_data(
     db: AsyncSession = Depends(get_session)
 ):
    
-    user_db = await ler_usuario(spotify_user_id)
+    user_db = await ler_usuario(db, spotify_user_id)
     
     if not user_db:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
@@ -81,8 +81,8 @@ async def get_user_basic_data(
             res_faixas, res_artistas, top_generos = await asyncio.gather(*tarefas)
 
             
-            top_faixa = list(res_faixas.values())[0] if res_faixas else None
-            top_artista = list(res_artistas.values())[0] if res_artistas else None
+            top_faixa = next(iter(res_faixas.tracks.values()), None)
+            top_artista = next(iter(res_artistas.artists.values()), None)
 
             return {
                 "nome_exibicao": user_db.nome_exibicao,
@@ -218,8 +218,8 @@ def converter_artista_e_relacionamento_para_dict(rel):
 
 
 @user_router.get("/perfil_musical")
-async def get_perfil_musical(user_id: str = Depends(get_current_user_id)):
-    usuario_banco = await ler_usuario(user_id)
+async def get_perfil_musical(user_id: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_session)):
+    usuario_banco = await ler_usuario(db, user_id)
     
     
     if usuario_banco and usuario_banco.perfil_emocional:

@@ -87,3 +87,10 @@ async def salvar_artistas_em_batch(db: AsyncSession, lista_artistas_data: list[A
         raise
 
 
+async def get_artists_by_ids(
+    db: AsyncSession,
+    artista_ids: list[str],
+) -> list[Artista]:
+    stmt = select(Artista).where(Artista.id_artista.in_(artista_ids))
+    result = await db.execute(stmt)
+    return list(result.scalars().all())

@@ -39,3 +39,24 @@ class FaixaCreate(SQLModel):
     class Config:
         populate_by_name = True 
         extra = 'ignore'
+
+
+class UnifiedTrack(SQLModel):
+    id_faixa: str
+    nome_faixa: str
+    link_imagem: Optional[str] = None
+    artista_principal: str
+    popularidade: int
+    duracao_ms: int
+    album: str
+
+    letra: Optional[str] = None
+    emocoes: Optional[dict[str, float]] = None
+
+    short_term_rank: Optional[int] = None
+    medium_term_rank: Optional[int] = None
+    long_term_rank: Optional[int] = None
+
+
+class UnifiedTracksResponse(SQLModel):
+    tracks: dict[str, UnifiedTrack]

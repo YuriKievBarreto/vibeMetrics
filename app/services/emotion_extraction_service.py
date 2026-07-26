@@ -252,7 +252,7 @@ Retorne agora SOMENTE o OBJETO JSON.
 """
 
 
-async def extrair_emocao_individual(idx: int, total: int, letra: str, semaphore: asyncio.Semaphore):
+async def extrair_emocao_individual(idx: int, total: int, letra: str, semaphore: asyncio.Semaphore) -> dict | None:
     if not letra or not str(letra).strip():
         return None
 
@@ -277,13 +277,30 @@ async def extrair_emocao_individual(idx: int, total: int, letra: str, semaphore:
             return None
 
 
-async def extrair_emocoes_batch_bedrock(lista_de_letras: list[str], chunk_size: int = 5, max_concurrency: int = 5):
+from typing import Any
+
+async def extrair_emocoes_batch_bedrock(
+    lista_de_letras: list[str],
+    chunk_size: int = 5,
+    max_concurrency: int = 5,
+) -> list[dict[str, float] | None]:
     total = len(lista_de_letras)
-    print(f"\n⚙️ Iniciando extração emocional ({PROVEDOR_LLM.upper()}) de {total} letras (concorrência máx: {max_concurrency})...")
-    
+    print(
+        f"\n⚙️ Iniciando extração emocional ({PROVEDOR_LLM.upper()}) "
+        f"de {total} letras (concorrência máx: {max_concurrency})..."
+    )
+
     semaphore = asyncio.Semaphore(max_concurrency)
-    tarefas = [extrair_emocao_individual(i, total, letra, semaphore) for i, letra in enumerate(lista_de_letras)]
-    
-    resultados = await asyncio.gather(*tarefas)
-    print(f"🎉 Extração de {total} letras finalizada com sucesso! Total de resultados: {len(resultados)}\n")
-    return list(resultados)
+    tarefas = [
+        extrair_emocao_individual(i, total, letra, semaphore)
+        for i, letra in enumerate(lista_de_letras)
+    ]
+
+    resultados: list[dict[str, Any] | None] = await asyncio.gather(*tarefas)
+
+    print(
+        f"🎉 Extração de {total} letras finalizada com sucesso! "
+        f"Total de resultados: {len(resultados)}\n"
+    )
+
+    return resultados

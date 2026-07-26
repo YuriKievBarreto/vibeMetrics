@@ -6,6 +6,7 @@ from app.models.usuario_top_artista import UsuarioTopArtista
 from app.models.artista import Artista
 from app.models.usuario_top_faixa import UsuarioTopFaixa
 from app.models.faixa import Faixa
+from datetime import datetime
 
 
 class Usuario(SQLModel, table=True):
@@ -18,7 +19,7 @@ class Usuario(SQLModel, table=True):
     access_token: str = Field(max_length=512)
     refresh_token: str = Field(max_length=1024)
     token_expires_at: Optional[datetime] = Field(default=None, sa_type=DateTime(timezone=True))
-    ultima_atualizacao: Optional[datetime] = Field(default=None, sa_type=DateTime(timezone=True))
+    ultima_atualizacao: Optional[datetime] = Field(default_factory=datetime.now().date(), sa_type=DateTime(timezone=True))
     status_processamento: Optional[str] = Field(default=None, max_length=512)
     perfil_emocional: Optional[str] = Field(default=None, sa_type=JSON)
 
@@ -48,3 +49,12 @@ class UserBasicData(SQLModel):
     top_faixa: Faixa
     top_artista: Artista
     top_generos: dict[str, int]
+
+
+class CurrentUserDetails(SQLModel):
+    id_usuario: str
+    nome_exibicao: str
+    pais: str
+    access_token: str
+    refresh_token: str
+    token_expires_at: datetime  

@@ -25,3 +25,18 @@ class ArtistaCreate(SQLModel):
     class Config:
         populate_by_name = True 
         extra = 'ignore'
+
+
+class UnifiedArtist(SQLModel):
+    id_artista: str
+    nome_artista: str
+    link_imagem: str | None = None
+    generos: list[str]
+    popularidade_artista: int
+
+    short_term_rank: int | None = None
+    medium_term_rank: int | None = None
+    long_term_rank: int | None = None
+
+class UnifiedArtistsResponse(SQLModel):
+    artists: dict[str, UnifiedArtist]

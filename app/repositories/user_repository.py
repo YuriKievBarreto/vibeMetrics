@@ -5,6 +5,8 @@ from app.models.usuario import Usuario, UsuarioCreate, UserBasicData
 from app.models.usuario_top_faixa import UsuarioTopFaixa
 from app.models.usuario_top_artista import UsuarioTopArtista
 from app.models.faixa import Faixa
+from sqlmodel import select
+from sqlalchemy.orm import selectinload
 from app.models.artista import Artista
 from datetime import datetime
 from app.core.database import async_engine
@@ -66,20 +68,42 @@ async def atualizar_credenciais_usuario(db: AsyncSession,
         raise e
     
 
-async def ler_usuario(user_id:str) -> Usuario | None:
-   async with AsyncSession(async_engine) as db:
-        try:
-            db_user = await db.get(Usuario, user_id)
+async def ler_usuario(
+    db: AsyncSession,
+    user_id: str,
+) -> Usuario | None:
+    try:
+        db_user = await db.get(Usuario, user_id)
 
-            if db_user is None:
-                print("Usuario de id {user_id} não encontrado")
-                return None
-            
-            print("usuario encontrado")
-            return db_user
-    
-        except Exception as e:
-            raise e 
+        if db_user is None:
+            print(f"Usuário de id {user_id} não encontrado")
+            return None
+
+        print("Usuário encontrado")
+        return db_user
+
+    except Exception:
+        raise
+
+
+
+
+
+async def ler_usuario_com_relacionamentos(
+    db: AsyncSession,
+    user_id: str,
+) -> Usuario | None:
+    stmt = (
+        select(Usuario)
+        .where(Usuario.id_usuario == user_id)
+        .options(
+            selectinload(Usuario.top_artistas_rel),
+            selectinload(Usuario.top_faixas_rel),
+        )
+    )
+
+    result = await db.execute(stmt)
+    return result.scalar_one_or_none()
         
 
 

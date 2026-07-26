@@ -90,3 +90,14 @@ async def salvar_faixas_em_batch(db: AsyncSession, lista_de_faixas_data: list[Fa
         print("Erro ao tentar adicionar faixas em lote com validação:", e)
        
         raise
+
+
+
+
+async def get_faixas_by_ids(
+    db: AsyncSession,
+    faixa_ids: list[str],
+) -> list[Faixa]:
+    stmt = select(Faixa).where(Faixa.id_faixa.in_(faixa_ids))
+    result = await db.execute(stmt)
+    return list(result.scalars().all())

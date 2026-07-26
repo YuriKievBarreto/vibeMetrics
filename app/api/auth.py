@@ -3,7 +3,9 @@ from app.core.spotipy_auth import sp_oauth_manager
 from starlette.responses import RedirectResponse
 from spotipy import Spotify
 from fastapi import BackgroundTasks
-from app.services.data_ingestion_service import salvar_dados_iniciais_do_usuario, salvar_top_faixas, salvar_top_artistas
+from app.services.user_service import salvar_dados_iniciais_do_usuario
+from app.services.faixa_service import salvar_top_faixas
+from app.services.artista_service import salvar_top_artistas
 from app.core.security import create_access_token   
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.user_repository import ler_usuario
@@ -35,7 +37,8 @@ async def login_spotify():
 @auth_router.get("/callback")
 async def spotify_callback(
     request: Request,
-    background_tasks: BackgroundTasks
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_session)
 ):
     code = request.query_params.get("code")
     if not code:
@@ -48,7 +51,7 @@ async def spotify_callback(
     access_token = token_info["access_token"]
 
     # Passo 2: Verifica existência do usuário (Rápido)
-    usuario_bd = await ler_usuario(user_id=user_id)
+    usuario_bd = await ler_usuario(db, user_id=user_id)
 
     if usuario_bd is None:
         print("Usuário novo — Criando registro mínimo...")
