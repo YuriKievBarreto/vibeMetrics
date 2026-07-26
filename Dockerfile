@@ -8,14 +8,17 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# Copia os arquivos de definição de dependência para cachear o build
-COPY pyproject.toml uv.lock ./
+# Copia os arquivos de definição de dependência e README para cachear o build
+COPY pyproject.toml uv.lock README.md ./
 
-# Instala as dependências usando uv sync
-RUN uv sync --frozen --no-cache
+# Instala apenas as dependências de terceiros para máximo aproveitamento de cache
+RUN uv sync --frozen --no-cache --no-install-project
 
 # Copia o código-fonte da aplicação
 COPY . .
+
+# Finaliza a instalação incluindo a própria aplicação
+RUN uv sync --frozen --no-cache
 
 EXPOSE 8000
 
