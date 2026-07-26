@@ -4,11 +4,9 @@ import asyncio
 import unicodedata
 import httpx
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
+from app.core.config import settings
 
-load_dotenv()
-
-GENIUS_ACCESS_TOKEN = os.getenv("GENIUS_ACCESS_TOKEN")
+GENIUS_ACCESS_TOKEN = settings.GENIUS_ACCESS_TOKEN
 GENIUS_SEARCH_URL = "https://api.genius.com/search"
 
 

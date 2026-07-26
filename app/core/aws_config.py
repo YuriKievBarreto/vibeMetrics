@@ -1,11 +1,14 @@
 import boto3
-import os
-from dotenv import load_dotenv
+from app.core.config import settings
 
-load_dotenv()
-aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
-aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+aws_access_key_id = settings.AWS_ACCESS_KEY_ID
+aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY
 
-aws_bedrock_client = boto3.client("bedrock-runtime", region_name="us-east-1", aws_access_key_id =aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
+aws_bedrock_client = boto3.client(
+    "bedrock-runtime",
+    region_name=settings.AWS_REGION,
+    aws_access_key_id=aws_access_key_id,
+    aws_secret_access_key=aws_secret_access_key
+)
 
 

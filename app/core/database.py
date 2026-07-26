@@ -4,11 +4,9 @@ from sqlmodel import SQLModel
 import asyncio
 import os
 from dotenv import load_dotenv
-load_dotenv()
+from app.core.config import settings
 
-
-DATABASE_URL = os.getenv("DATABASE_URL")
-print(DATABASE_URL)
+DATABASE_URL = settings.DATABASE_URL
 
 
 def get_db_structure(sync_conn):
@@ -23,9 +21,6 @@ def get_db_structure(sync_conn):
         columns = inspector.get_columns(table_name)
         column_names = [col['name'] for col in columns]
 
-
-    print(db_structure)
-
     return db_structure
 
 
@@ -39,8 +34,7 @@ async def init_db():
     try:
         async with async_engine.begin() as conn:
             print("iniciando tentativa de conexao com o banco de dados")
-            print("criando todas as tabelas")
-            await conn.run_sync(SQLModel.metadata.drop_all)
+            print("verificando e criando tabelas...")
             await conn.run_sync(SQLModel.metadata.create_all)
             print("conexao bem sucedida")
 

@@ -1,15 +1,9 @@
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
-import os
 from spotipy.oauth2 import SpotifyOAuth
-from dotenv import load_dotenv
+from app.core.config import settings
 
-
-load_dotenv()
-
-CLIENT_ID = os.getenv("SPOTIPY_CLIENT_ID")
-CLIENT_SECRET = os.getenv("SPOTIPY_CLIENT_SECRET")
-REDIRECT_URI = os.getenv("SPOTIPY_REDIRECT_URI")
+CLIENT_ID = settings.SPOTIPY_CLIENT_ID
+CLIENT_SECRET = settings.SPOTIPY_CLIENT_SECRET
+REDIRECT_URI = settings.SPOTIPY_REDIRECT_URI
 
 todos_os_escopos = "user-read-private user-top-read user-read-recently-played user-read-playback-position   user-read-currently-playing"
 

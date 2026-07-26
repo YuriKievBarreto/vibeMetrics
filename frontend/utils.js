@@ -1,7 +1,8 @@
-const currentHost = typeof window !== 'undefined' && window.location.hostname ? window.location.hostname : '127.0.0.1';
+const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const currentHost = isLocalhost ? window.location.hostname : '127.0.0.1';
 
 const endereco_local = `http://${currentHost}:8000`;
-export const endereco_frontend = `http://${currentHost}:5501`;
+export const endereco_frontend = isLocalhost ? `http://${currentHost}:5501` : window.location.origin;
 const endereco_aws = "edereco aws";
 
 export const endereco_api_em_uso = endereco_local;

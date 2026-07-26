@@ -8,8 +8,7 @@ from dotenv import load_dotenv
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-load_dotenv()
-
+from app.core.config import settings
 from app.core.aws_config import aws_bedrock_client
 
 # ==============================================================================
@@ -17,7 +16,7 @@ from app.core.aws_config import aws_bedrock_client
 # ==============================================================================
 
 # Defina o provedor ativo: "groq" ou "bedrock" (pode ser alternado via env EMOTION_LLM_PROVIDER)
-PROVEDOR_LLM = os.getenv("EMOTION_LLM_PROVIDER", "groq").lower()# Lista de modelos do Groq (Free Tier) ordenados por prioridade para fallback automático
+PROVEDOR_LLM = settings.EMOTION_LLM_PROVIDER.lower()# Lista de modelos do Groq (Free Tier) ordenados por prioridade para fallback automático
 GROQ_FALLBACK_CHAIN = [
     "llama-3.3-70b-versatile",        # 1. Recomendado (Llama 3.3 70B)
     "llama-3.1-70b-versatile",        # 2. Llama 3.1 70B

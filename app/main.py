@@ -10,27 +10,24 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 
-print("rodando em http://localhost:8000")
+from app.core.config import settings
+
+
+print(f"Aplicação rodando em ambiente [{settings.ENVIRONMENT.upper()}] - {settings.DEFAULT_ADDRESS}")
 
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-  
     await init_db()
-    print("aplicação rodando e conectada com o banco de dados")
-    print("rodando em http://localhost:8000/api/v1/auth/login")
-    print("rodando em http://127.0.0.1:8000/")
-
-
+    print(f"Aplicação rodando em {settings.DEFAULT_ADDRESS}")
     yield 
-    
-   
     print("Aplicação encerrada, recursos liberados.")
 
 
 app = FastAPI(
     title="spotify analytics",
+    debug=settings.DEBUG,
     lifespan=lifespan
 )
 
@@ -38,13 +35,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5501",    # Live Server (comum no VS Code)
-        "http://127.0.0.1:5501",
-        "http://localhost:8000",    # Seu front rodando no Docker/Local
-        "http://127.0.0.1:8000",
-        "https://yurikievbarreto.github.io", # URL do seu projeto no GitHub Pages
-    ],
+    allow_origins=settings.allowed_origins,
     allow_credentials=True,         # ESSENCIAL para cookies/session_token
     allow_methods=["*"],
     allow_headers=["*"],

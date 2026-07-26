@@ -12,9 +12,7 @@ from app.services.user_service import salvar_dados_iniciais_do_usuario, validar_
 from app.services.faixa_service import salvar_top_faixas
 from app.services.artista_service import salvar_top_artistas
 
-load_dotenv()
-
-FRONTEND_ADDRESS = os.getenv("FRONTEND_ADDRESS")
+from app.core.config import settings
 
 
 def gerar_url_autenticacao_spotify() -> str:
@@ -64,7 +62,7 @@ async def processar_callback_autenticacao(
         background_tasks.add_task(validar_e_renovar_credenciais, user_id)
 
     session_token = create_access_token(subject=user_id)
-    frontend_address = os.getenv("FRONTEND_ADDRESS", "http://127.0.0.1:5501/frontend")
+    frontend_address = settings.FRONTEND_ADDRESS or "http://127.0.0.1:5501/frontend"
     frontend_base = frontend_address.strip().rstrip("/")
     redirect_url = f"{frontend_base}/dashboard.html"
 
