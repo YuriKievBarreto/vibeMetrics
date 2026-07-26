@@ -5,7 +5,7 @@ from sqlalchemy import DateTime, JSON
 from app.models.usuario_top_artista import UsuarioTopArtista
 from app.models.artista import Artista
 from app.models.usuario_top_faixa import UsuarioTopFaixa
-from app.models.faixa import Faixa
+from app.models.faixa import Faixa, FaixaEmocional
 from datetime import datetime
 
 
@@ -58,3 +58,14 @@ class CurrentUserDetails(SQLModel):
     access_token: str
     refresh_token: str
     token_expires_at: datetime  
+
+
+class Sentimento(SQLModel):
+    nome: str
+    intensidade: float
+    faixa: FaixaEmocional
+
+class PerfilMusical(SQLModel):
+    top1_sentimento: Sentimento
+    top2_sentimento: Sentimento
+    texto_perfil_emocional: str

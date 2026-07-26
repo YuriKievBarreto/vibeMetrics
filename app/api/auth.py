@@ -29,17 +29,17 @@ auth_router = APIRouter(
 )
 
 
-@auth_router.get("/login")
-async def login_spotify():
+@auth_router.get("/login", response_class=RedirectResponse)
+async def login_spotify() -> RedirectResponse:
     auth_url = sp_oauth_manager.get_authorize_url()
     return RedirectResponse(auth_url)
 
-@auth_router.get("/callback")
+@auth_router.get("/callback", response_class=RedirectResponse)
 async def spotify_callback(
     request: Request,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_session)
-):
+) -> RedirectResponse:
     code = request.query_params.get("code")
     if not code:
         raise HTTPException(status_code=400, detail="Código de autorização ausente")

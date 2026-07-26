@@ -1,5 +1,6 @@
 from typing import Optional
 from sqlmodel import SQLModel, Field, Relationship
+from app.models.faixa import UnifiedTrack
 
 
 class UsuarioTopFaixa(SQLModel, table=True):
@@ -24,3 +25,10 @@ class UsuarioTopFaixaCreate(SQLModel):
     medium_time_rank: int
     long_time_rank: int
     
+
+class TopFaixaResponse(SQLModel):
+    sentimento_predominante: str
+    pontuacao_sentimento_predominante: float
+    duracao_media_ms: float
+    popularidade_media: float
+    faixas: list[UnifiedTrack]

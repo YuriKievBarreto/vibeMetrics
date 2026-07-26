@@ -96,9 +96,9 @@ async def salvar_top_faixas(user_id: str, access_token: str):
             lista_faixas_para_adicionar.append(faixa_create)
 
             rank_map[faixa_id] = {
-                "short": valor_faixa.short_term_rank,
-                "medium": valor_faixa.medium_term_rank,
-                "long": valor_faixa.long_term_rank,
+                "short": valor_faixa.short_rank,
+                "medium": valor_faixa.medium_rank,
+                "long": valor_faixa.long_rank,
             }
 
         print("salvando/atualizando faixas no banco de dados (Passo 1/2)")

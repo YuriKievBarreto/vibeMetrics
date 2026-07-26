@@ -54,7 +54,7 @@ async def get_top_faixas(access_token: str, quantitade: int = 20, time_ranges: l
     
         resultados =  sp.current_user_top_tracks(time_range=term, limit=quantitade)
         
-        rank_key = f"{term}_rank" 
+        rank_key = f"{term.replace('_term', '')}_rank" 
         
     
         for rank_index, item in enumerate(resultados.get("items", [])):
@@ -106,7 +106,7 @@ async def get_top_artistas(
             limit=quantitade,
         )
 
-        rank_key = f"{term}_rank"
+        rank_key = f"{term.replace('_term', '')}_rank"
 
         for rank_index, item in enumerate(resultados.get("items", [])):
             artist_id = item["id"]

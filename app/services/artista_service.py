@@ -29,9 +29,9 @@ async def salvar_top_artistas(user_id: str, access_token: str) -> None:
             lista_artistas_para_adicionar.append(artista_create)
 
             rank_map[id_artista] = {
-                "short": artista.short_term_rank,
-                "medium": artista.medium_term_rank,
-                "long": artista.long_term_rank,
+                "short": artista.short_rank,
+                "medium": artista.medium_rank,
+                "long": artista.long_rank,
             }
             
 

@@ -5,8 +5,12 @@ from app.services.data_ingestion_service import refresh_and_get_access_token
 from app.repositories.user_repository import atualizar_credenciais_usuario, ler_usuario
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
-from app.models.gerais import LogoutResponse
+from app.models.gerais import LogoutResponse, SessionStatusResponse
+from app.models.usuario import UserBasicData, PerfilMusical, Sentimento
+from app.models.usuario_top_faixa import TopFaixaResponse
+from app.models.faixa import UnifiedTrack, FaixaEmocional
 from datetime import datetime, timezone
+from app.models.artista import UnifiedArtist
 from app.repositories.user_repository import ler_usuario, get_basic_data, atualizar_perfil_emocional
 from app.services.spotipy_service import get_top_faixas, get_top_artistas, get_user_top_genres
 from app.repositories.usuario_top_faixa_repository import ler_usuario_top_faixas
@@ -27,11 +31,11 @@ user_router = APIRouter(
     tags=["user"]
 )
 
-@user_router.get("/me")
+@user_router.get("/me", response_model=SessionStatusResponse)
 async def me(
      spotify_user_id: str = Depends(get_current_user_id),
      db: AsyncSession = Depends(get_session)
-):  
+)-> dict[str, str]:  
     await valida_credenciais(spotify_user_id, db)
 
     return {"message": "logado",
@@ -46,20 +50,19 @@ async def logout():
 
 @user_router.get("/current_session_user_id")
 async def get_user_id(
-    spotify_user_id: str = Depends(get_current_user_id),
-     db: AsyncSession = Depends(get_session)):
-    
+    spotify_user_id: str = Depends(get_current_user_id)
+) -> str:
     return spotify_user_id
 
 
 import asyncio
 from fastapi import Depends, HTTPException
 
-@user_router.get("/get_user_basic_data")
+@user_router.get("/get_user_basic_data", response_model=UserBasicData)
 async def get_user_basic_data(
     spotify_user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_session)
-):
+) -> UserBasicData:
    
     user_db = await ler_usuario(db, spotify_user_id)
     
@@ -83,13 +86,12 @@ async def get_user_basic_data(
             
             top_faixa = next(iter(res_faixas.tracks.values()), None)
             top_artista = next(iter(res_artistas.artists.values()), None)
-
-            return {
-                "nome_exibicao": user_db.nome_exibicao,
-                "top_faixa": top_faixa,
-                "top_artista": top_artista,
-                "top_generos": top_generos
-            }
+            return UserBasicData(
+                nome_exibicao=user_db.nome_exibicao,
+                top_faixa=top_faixa,
+                top_artista=top_artista,
+                top_generos=top_generos
+            )
         except Exception as e:
             print(f"Erro ao buscar dados no Spotify: {e}")
             raise HTTPException(status_code=502, detail="Erro ao buscar dados no Spotify")
@@ -103,7 +105,7 @@ async def get_user_basic_data(
 
 
 async def valida_credenciais(spotify_user_id: str, db: AsyncSession):
-    usuario = await ler_usuario(user_id=spotify_user_id)
+    usuario = await ler_usuario(db, spotify_user_id)
     current_time = datetime.now(timezone.utc)
 
     if current_time >= usuario.token_expires_at:
@@ -119,8 +121,8 @@ async def valida_credenciais(spotify_user_id: str, db: AsyncSession):
     print("token não expirado")
 
 
-@user_router.get("/top_musicas")
-async def user_top_musicas(user_id: str = Depends(get_current_user_id)):
+@user_router.get("/top_musicas", response_model=TopFaixaResponse)
+async def user_top_musicas(user_id: str = Depends(get_current_user_id)) -> TopFaixaResponse:
     
     relacionamentos = await ler_usuario_top_faixas(user_id)
     
@@ -158,41 +160,40 @@ async def user_top_musicas(user_id: str = Depends(get_current_user_id)):
     duracao_media = int(np.round(duracoes.mean(), 0)) if len(duracoes) > 0 else 0
     popularidade_media = float(np.round(popularidades.mean(), 0)) if len(popularidades) > 0 else 0.0
 
-    dict_resposta = {
-        "sentimento_predominante": sentimento_predominante,
-        "pontuacao_sentimento_predominante": pontuacao_predominante,
-        "duracao_media_ms": duracao_media,
-        "popularidade_media": popularidade_media,
-        "faixas": [converter_faixa_e_relacionamento_para_dict(rel) for rel in relacionamentos]
-    }
-
-    return dict_resposta
+    return TopFaixaResponse(
+        sentimento_predominante=sentimento_predominante,
+        pontuacao_sentimento_predominante=pontuacao_predominante,
+        duracao_media_ms=duracao_media,
+        popularidade_media=popularidade_media,
+        faixas=[converter_faixa_e_relacionamento_para_obj(rel) for rel in relacionamentos]
+)
 
 
 
 
-def converter_faixa_e_relacionamento_para_dict(rel):
+def converter_faixa_e_relacionamento_para_obj(rel) -> UnifiedTrack:
     emo = rel.faixa.emocoes
     if isinstance(emo, str):
         try:
-            emo = json.loads(emo)
+            emo: dict[str, float] = json.loads(emo)
         except Exception:
             pass
-    return {
-        "nome_faixa": rel.faixa.nome_faixa,
-        "album": rel.faixa.album,
-        "link_imagem": rel.faixa.link_imagem,
-        "emocoes": emo,
-        "duracao_ms": rel.faixa.duracao_ms,
-        "short_rank": rel.short_time_rank,
-        "medium_rank": rel.medium_time_rank,
-        "long_rank": rel.long_time_rank,
-        "popularidade": rel.faixa.popularidade,
-        "artista_principal": rel.faixa.artista_principal
-    }
+    return UnifiedTrack(
+        id_faixa=rel.faixa.id_faixa,
+        nome_faixa= rel.faixa.nome_faixa,
+        album= rel.faixa.album,
+        link_imagem= rel.faixa.link_imagem,
+        emocoes= emo,
+        duracao_ms= rel.faixa.duracao_ms,
+        short_rank= rel.short_time_rank,
+        medium_rank= rel.medium_time_rank,
+        long_rank= rel.long_time_rank,
+        popularidade= rel.faixa.popularidade,
+        artista_principal= rel.faixa.artista_principal
+)
 
-@user_router.get("/top_artistas")
-async def user_top_artistas( user_id: str = Depends(get_current_user_id)):
+@user_router.get("/top_artistas", response_model=list[UnifiedArtist])
+async def user_top_artistas( user_id: str = Depends(get_current_user_id)) -> list[UnifiedArtist]:
 
     relacoinamentos = await ler_usuario_top_artistas(user_id)
     print("rodando top artistas")
@@ -204,23 +205,22 @@ async def user_top_artistas( user_id: str = Depends(get_current_user_id)):
 
 
 
-def converter_artista_e_relacionamento_para_dict(rel):
-    return {
-        "nome_artista": rel.artista.nome_artista,
-        "link_imagem": rel.artista.link_imagem,
-        "short_rank": rel.short_time_rank,
-        "medium_rank": rel.medium_time_rank,
-        "long_rank": rel.long_time_rank,
-        "popularidade_artista": rel.artista.popularidade_artista,
-        "generos": rel.artista.generos
-    }
+def converter_artista_e_relacionamento_para_dict(rel) -> UnifiedArtist:
+    return UnifiedArtist(
+        nome_artista=rel.artista.nome_artista,
+        link_imagem=rel.artista.link_imagem,
+        short_rank=rel.short_time_rank,
+        medium_rank=rel.medium_time_rank,
+        long_rank=rel.long_time_rank,
+        popularidade_artista=rel.artista.popularidade_artista,
+        generos=rel.artista.generos
+    )
 
 
 
-@user_router.get("/perfil_musical")
-async def get_perfil_musical(user_id: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_session)):
+@user_router.get("/perfil_musical", response_model=PerfilMusical | str)
+async def get_perfil_musical(user_id: str = Depends(get_current_user_id), db: AsyncSession = Depends(get_session)) -> PerfilMusical | str:
     usuario_banco = await ler_usuario(db, user_id)
-    
     
     if usuario_banco and usuario_banco.perfil_emocional:
         return usuario_banco.perfil_emocional
@@ -280,11 +280,21 @@ async def get_perfil_musical(user_id: str = Depends(get_current_user_id), db: As
     })
     dict_faixa2.pop("emocoes", None)
 
-    dict_resposta = {
-        "top1_sentimento": {"nome": top1_nome, "intensidade": top1_intensidade, "faixa": dict_faixa1},
-        "top2_sentimento": {"nome": top2_nome, "intensidade": top2_intensidade, "faixa": dict_faixa2},
-        "texto_perfil_emocional": texto_perfil
-    }
+    dict_resposta = PerfilMusical(
+        top1_sentimento=Sentimento(
+            nome=top1_nome,
+            intensidade=top1_intensidade,
+            faixa=FaixaEmocional(**dict_faixa1)
+        ),
+        top2_sentimento=Sentimento(
+            nome=top2_nome,
+            intensidade=top2_intensidade,
+            faixa=FaixaEmocional(**dict_faixa2)
+        ),
+        texto_perfil_emocional=texto_perfil
+)
+
+    
 
   
     await atualizar_perfil_emocional(user_id, dict_resposta)

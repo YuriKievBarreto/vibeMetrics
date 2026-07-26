@@ -28,15 +28,17 @@ class ArtistaCreate(SQLModel):
 
 
 class UnifiedArtist(SQLModel):
-    id_artista: str
+    id_artista: Optional[str] = None
     nome_artista: str
     link_imagem: str | None = None
     generos: list[str]
     popularidade_artista: int
 
-    short_term_rank: int | None = None
-    medium_term_rank: int | None = None
-    long_term_rank: int | None = None
+    short_rank: int | None = None
+    medium_rank: int | None = None
+    long_rank: int | None = None
 
 class UnifiedArtistsResponse(SQLModel):
     artists: dict[str, UnifiedArtist]
+
+

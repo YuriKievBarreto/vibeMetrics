@@ -12,6 +12,7 @@ from datetime import datetime
 from app.core.database import async_engine
 from app.repositories.usuario_top_artista_repository import ler_usuario_top_artistas
 from app.repositories.usuario_top_faixa_repository import ler_usuario_top_faixas
+from app.models.usuario import PerfilMusical
 from app.utils.general import contar_elementos
 from sqlalchemy import update
 from sqlalchemy.exc import SQLAlchemyError
@@ -169,14 +170,14 @@ async def atualizar_status(spotify_user_id: str, status: str) -> Usuario | None:
 
 
 
-async def atualizar_perfil_emocional(id_usuario: str, json_perfil: dict) -> None:
+async def atualizar_perfil_emocional(id_usuario: str, json_perfil: PerfilMusical) -> None:
      async with AsyncSession(async_engine) as db:
         try:
             print("atualizando perfil emocional do usuário")
             stmt = (
             update(Usuario)
             .where(Usuario.id_usuario == id_usuario)
-            .values(perfil_emocional=json_perfil)
+            .values(perfil_emocional=json_perfil.model_dump())
         )
         
             await db.execute(stmt)
