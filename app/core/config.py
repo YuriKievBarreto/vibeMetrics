@@ -25,6 +25,11 @@ def _resolve_database_url() -> str:
     url = os.getenv("DATABASE_URL", "").strip()
 
     if url:
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgresql://") and not url.startswith("postgresql+"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
         if db_host and db_host != "localhost" and ("@localhost:" in url or "@127.0.0.1:" in url):
             url = url.replace("@localhost:", f"@{db_host}:").replace("@127.0.0.1:", f"@{db_host}:")
         return url

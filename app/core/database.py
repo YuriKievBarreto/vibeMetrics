@@ -24,7 +24,10 @@ def get_db_structure(sync_conn):
     return db_structure
 
 
-async_engine = create_async_engine(DATABASE_URL)
+async_engine = create_async_engine(
+    DATABASE_URL,
+    connect_args={"statement_cache_size": 0}
+)
 
 
 async def init_db():

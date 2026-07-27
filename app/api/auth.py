@@ -35,12 +35,13 @@ async def spotify_callback(
         status_code=status.HTTP_302_FOUND
     )
 
+    is_prod = settings.ENVIRONMENT in ("production", "prod")
     response.set_cookie(
         key="session_token",
         value=session_token,
         httponly=True,
-        secure=False,
-        samesite="lax",
+        secure=is_prod,
+        samesite="none" if is_prod else "lax",
         max_age=43200 * 60,
         path="/"
     )
