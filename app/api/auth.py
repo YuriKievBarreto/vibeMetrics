@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Depends, status, BackgroundTasks
 from starlette.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_session
+from app.core.config import settings
 from app.services.auth_service import (
     gerar_url_autenticacao_spotify,
     processar_callback_autenticacao,
