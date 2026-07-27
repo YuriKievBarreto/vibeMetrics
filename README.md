@@ -22,22 +22,29 @@
 
 > ⚠️ **Nota:** O Vibe Metrics é operado como um serviço em nuvem e não foi estruturado para instalação/execução local por terceiros.
 
-- 🚀 **Versão Oficial em Produção:** [<link do github pages (oficial)>](https://yurikievbarreto.github.io/spotify-analytics)
-- 🎮 **Demo Interativa (Preview Estático):** [<link do github pages (demo)>](https://yurikievbarreto.github.io/spotify-analytics/demo)
+- 🚀 **Versão Oficial em Produção:** [<link do github pages (oficial)>](https://yurikievbarreto.github.io/vibeMetrics/frontend/)
+- 🎮 **Demo Interativa (Preview Estático):** [<link do github pages (demo)>](https://yurikievbarreto.github.io/vibeMetrics/demo)
 
 ---
 
 ## 📌 Sumário
-- [Visão Geral](#-visão-geral)
-- [🧠 Destaque: Uso de Inteligência Artificial](#-destaque-uso-de-inteligência-artificial)
-  - [1. Vetor Emocional Multi-dimensional (18 Emoções)](#1-vetor-emocional-multi-dimensional-18-emoções)
-  - [2. Arquitetura LLM Resiliente & Fallback Automático](#2-arquitetura-llm-resiliente--fallback-automático)
-  - [3. Perfilamento Comportamental & Análise Poética](#3-perfilamento-comportamental--análise-poética)
-- [✨ Funcionalidades do Sistema](#-funcionalidades-do-sistema)
-- [🛠️ Tecnologias Utilizadas](#️-tecnologias-utilizadas)
-- [🌐 Endpoints Principais da API](#-endpoints-principais-da-api)
-- [📂 Estrutura do Repositório](#-estrutura-do-repositório)
-- [👤 Autor](#-autor)
+- [🎵 Vibe Metrics — Spotify Analytics \& Emotional AI](#-vibe-metrics--spotify-analytics--emotional-ai)
+  - [🔗 Links de Acesso](#-links-de-acesso)
+  - [📌 Sumário](#-sumário)
+  - [📖 Visão Geral](#-visão-geral)
+  - [🧠 Destaque: Uso de Inteligência Artificial](#-destaque-uso-de-inteligência-artificial)
+    - [1. Vetor Emocional Multi-dimensional (18 Emoções)](#1-vetor-emocional-multi-dimensional-18-emoções)
+    - [2. Arquitetura LLM Resiliente \& Fallback Automático](#2-arquitetura-llm-resiliente--fallback-automático)
+    - [3. Perfilamento Comportamental \& Análise Poética](#3-perfilamento-comportamental--análise-poética)
+  - [✨ Funcionalidades do Sistema](#-funcionalidades-do-sistema)
+  - [🛠️ Tecnologias Utilizadas](#️-tecnologias-utilizadas)
+    - [Backend](#backend)
+    - [Inteligência Artificial \& NLP](#inteligência-artificial--nlp)
+    - [Frontend](#frontend)
+  - [🏗️ Arquitetura e Fluxo de Dados](#️-arquitetura-e-fluxo-de-dados)
+  - [🌐 Endpoints Principais da API](#-endpoints-principais-da-api)
+  - [📂 Estrutura do Repositório](#-estrutura-do-repositório)
+  - [👤 Autor](#-autor)
 
 ---
 
