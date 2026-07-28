@@ -3,7 +3,7 @@ const currentHost = isLocalhost ? window.location.hostname : '127.0.0.1';
 
 const endereco_local = `http://${currentHost}:8000`;
 export const endereco_prod = 'https://vibemetrics-rybg.onrender.com';
-export const endereco_frontend = isLocalhost ? `http://${currentHost}:5501` : window.location.origin;
+export const endereco_frontend = isLocalhost ? `http://${currentHost}:5501` : `${window.location.origin}/vibeMetrics`;
 
 export const endereco_api_em_uso = isLocalhost ? endereco_local : endereco_prod;
 
