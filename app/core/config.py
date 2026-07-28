@@ -49,8 +49,8 @@ class Settings(BaseModel):
     # Endereços Base
     DEFAULT_ADDRESS: str = Field(default_factory=lambda: os.getenv("DEFAULT_ADDRESS", "http://127.0.0.1:8000").strip())
     FRONTEND_ADDRESS: str = Field(default_factory=lambda: os.getenv("FRONTEND_ADDRESS", "http://127.0.0.1:5501/frontend").strip())
-
     # Origens Permitidas no CORS
+
     @property
     def allowed_origins(self) -> List[str]:
         raw_origins = os.getenv("ALLOWED_ORIGINS")
