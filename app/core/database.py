@@ -62,5 +62,13 @@ async def init_db():
         raise e
 
 
-def get_session() -> AsyncSession:
-    return AsyncSession(async_engine)
+from typing import AsyncGenerator
+from sqlalchemy.ext.asyncio import async_sessionmaker
+
+async_session_maker = async_sessionmaker(async_engine, expire_on_commit=False)
+
+
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as session:
+        yield session
+
