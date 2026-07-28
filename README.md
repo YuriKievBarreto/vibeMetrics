@@ -22,8 +22,8 @@
 
 > ⚠️ **Nota:** O Vibe Metrics é operado como um serviço em nuvem e não foi estruturado para instalação/execução local por terceiros.
 
-- 🚀 **Versão Oficial em Produção:** [<link do github pages (oficial)>](https://yurikievbarreto.github.io/vibeMetrics/frontend/)
-- 🎮 **Demo Interativa (Preview Estático):** [<link do github pages (demo)>](https://yurikievbarreto.github.io/vibeMetrics/demo)
+- 🚀 **Versão Oficial em Produção:** [Vibe Metrics](https://yurikievbarreto.github.io/vibeMetrics/frontend/)
+- 🎮 **Demo Interativa (Preview Estático):** [demo Vibe Metrcis](https://yurikievbarreto.github.io/vibeMetrics/demo)
 
 ---
 
@@ -158,7 +158,159 @@ Além de números, a IA atua na interpretação qualitativa dos hábitos do usu�
 
 ## 🏗️ Arquitetura e Fluxo de Dados
 
-> ⚠️ *Diagrama de arquitetura temporariamente indisponível para atualização.*
+### Visão Geral da Arquitetura
+
+O sistema é composto por três camadas principais: **Frontend estático** hospedado no GitHub Pages, **Backend FastAPI** hospedado no Render, e **Banco de Dados PostgreSQL** gerenciado pelo Supabase.
+
+```mermaid
+graph TB
+    subgraph "Frontend (GitHub Pages)"
+        LP[Landing Page<br/>index.html]
+        DB[Dashboard<br/>dashboard.html]
+        AR[Artistas<br/>artistas.html]
+        MU[Músicas<br/>musicas.html]
+        EM[Emoções IA<br/>emocoes.html]
+    end
+
+    subgraph "Backend (Render — FastAPI)"
+        AUTH["/auth/login<br/>/auth/callback"]
+        USER["/user/me<br/>/user/get_user_basic_data<br/>/user/top_musicas<br/>/user/top_artistas<br/>/user/perfil_musical"]
+        BG["Background Tasks<br/>(asyncio)"]
+        AI["Pipeline de IA<br/>(Groq + Bedrock)"]
+        LS["Extrator de Letras<br/>(Letras.mus.br / Genius)"]
+    end
+
+    subgraph "Serviços Externos"
+        SP[Spotify Web API]
+        GQ[Groq Cloud LLM]
+        AW[AWS Bedrock]
+        GE[Genius API]
+    end
+
+    subgraph "Banco de Dados (Supabase — PostgreSQL)"
+        TB[(usuario<br/>artista<br/>faixa<br/>usuario_top_artista<br/>usuario_top_faixa)]
+    end
+
+    LP -- "OAuth redirect" --> AUTH
+    AUTH -- "token + redirect" --> DB
+    DB & AR & MU & EM -- "fetch + cookie JWT" --> USER
+    USER --> TB
+    AUTH --> BG
+    BG --> SP
+    BG --> TB
+    BG --> LS
+    LS --> GE
+    BG --> AI
+    AI --> GQ
+    AI --> AW
+    AI --> TB
+```
+
+---
+
+### Fluxo 1 — Autenticação OAuth 2.0
+
+```
+Usuário clica "Entrar com Spotify"
+        │
+        ▼
+GET /api/v1/auth/login
+        │  redireciona
+        ▼
+accounts.spotify.com  ──── usuário autoriza ────►
+        │
+        ▼
+GET /api/v1/auth/callback?code=...
+        │
+        ├─► Troca code por access_token + refresh_token (Spotipy)
+        ├─► Obtém ID do usuário no Spotify
+        ├─► Cria/atualiza registro na tabela `usuario`
+        ├─► Gera JWT (session_token) → Set-Cookie HTTP-Only
+        └─► Dispara Background Task de ingestão
+        │
+        ▼
+302 Redirect → frontend/dashboard.html
+```
+
+---
+
+### Fluxo 2 — Ingestão de Dados (Background Task)
+
+```
+Background Task (não bloqueia a resposta HTTP)
+        │
+        ├─► salvar_top_faixas()
+        │       ├─► Spotify API: top tracks (short, medium, long term)
+        │       ├─► Salva/atualiza tabelas `faixa` e `usuario_top_faixa`
+        │       ├─► Para cada faixa nova:
+        │       │       ├─► Extrai letra (Letras.mus.br → fallback Genius)
+        │       │       └─► Pipeline de IA: extrai vetor emocional (18 dimensões)
+        │       └─► Persiste emoções na coluna `faixa.emocoes` (JSON)
+        │
+        └─► salvar_top_artistas()
+                ├─► Spotify API: top artists (short, medium, long term)
+                └─► Salva/atualiza tabelas `artista` e `usuario_top_artista`
+```
+
+---
+
+### Fluxo 3 — Pipeline de Análise Emocional por IA
+
+```
+Letra da Música (texto bruto)
+        │
+        ▼
+┌──────────────────────────────────────────────────────┐
+│                  Groq LLM Chain                       │
+│  1. llama-3.3-70b-versatile (principal)               │
+│  2. llama-3.1-70b-versatile  ┐                        │
+│  3. llama-3.1-8b-instant     │  fallback sequencial   │
+│  4. mixtral-8x7b-32768       │  em caso de rate limit │
+│  5. deepseek-r1-distill...   ┘                        │
+└────────────────────┬─────────────────────────────────┘
+                     │  Falha total (quota esgotada)?
+                     ▼
+        ┌────────────────────────┐
+        │  AWS Bedrock Fallback  │
+        │  amazon.nova-micro-v1  │
+        └────────────┬───────────┘
+                     │
+                     ▼
+     JSON estruturado com 18 dimensões emocionais
+     { "alegria": 0.82, "tristeza": 0.12, ... }
+                     │
+                     ▼
+        Salvo em `faixa.emocoes` (JSON)
+                     │
+                     ▼
+     Agregação: média ponderada de todas as faixas
+                     │
+                     ▼
+     Perfil emocional consolidado do usuário
+     (salvo em `usuario.perfil_emocional`)
+```
+
+---
+
+### Fluxo 4 — Requisição Autenticada do Frontend
+
+```
+Frontend (ex: musicas.html)
+        │
+        ├─► fetch(API_ENDPOINTS.TOP_TRACKS, { credentials: "include" })
+        │       └─► Cookie `session_token` enviado automaticamente
+        │
+        ▼
+GET /api/v1/user/top_musicas
+        │
+        ├─► Middleware: valida JWT do cookie session_token
+        ├─► Extrai `user_id` do token
+        ├─► Consulta `usuario_top_faixa` + `faixa` no PostgreSQL
+        └─► Retorna JSON com faixas, rankings e emoções
+        │
+        ▼
+Frontend renderiza cards, gráficos e filtros por período
+```
 
 ---
 
