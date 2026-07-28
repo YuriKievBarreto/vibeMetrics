@@ -38,7 +38,14 @@ async def me(
 @user_router.post("/logout", response_model=LogoutResponse)
 async def logout():
     response = JSONResponse(content=LogoutResponse(message="Logout bem sucedido").model_dump())
-    response.delete_cookie(key=SESSION_TOKEN_COOKIE_NAME, path="/")
+    is_prod = settings.ENVIRONMENT in ("production", "prod")
+    response.delete_cookie(
+        key=SESSION_TOKEN_COOKIE_NAME,
+        path="/",
+        httponly=True,
+        secure=is_prod,
+        samesite="none" if is_prod else "lax"
+    )
     return response
 
 
