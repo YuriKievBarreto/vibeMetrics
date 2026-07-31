@@ -159,28 +159,23 @@
         }
 
         const data = await response.json();
-        console.log("PRINTANDO DATA")
-        console.log(data)
+        
         
 
         // ===== Música =====
         const topTrack = data.top_faixa
-        console.log("PRINTANDO TopTrack")
-        console.log(topTrack)
+       
         document.getElementById("topTrackImg").src = topTrack.link_imagem;
         document.getElementById("topTrackName").textContent = topTrack.nome_faixa;
 
-        console.log(topTrack.link_imagem, topTrack.nome_faixa)
+       
         
         
         const topArtistForTrack = data.top_artista;
         document.getElementById("topTrackArtist").textContent = topArtistForTrack.nome_artista;
-        console.log("PRINTANDO TOP ARTISTA")
-        console.log(topArtistForTrack)
-
+        
         // ===== Artista =====
-        console.log("PRINTANDO artisat")
-        console.log(topArtistForTrack)
+        
         const topArtist = data.top_artista;
         document.getElementById("topArtistImg").src = topArtist.link_imagem;
         document.getElementById("topArtistName").textContent = data.top_faixa.artista_principal;
