@@ -5,12 +5,13 @@ from app.models.artista import ArtistaCreate
 from app.repositories.user_repository import atualizar_status
 from app.repositories.artista_repository import salvar_artistas_em_batch
 from app.services.usuario_top_artista_service import salvar_relacionamentos_top_artistas
+from app.core.config import settings
 
 
 
 async def salvar_top_artistas(user_id: str, access_token: str) -> None:
     async with AsyncSession(async_engine) as db:
-        top_artistas = await get_top_artistas(access_token=access_token, quantitade=10, time_ranges=["short_term", "medium_term", "long_term"])
+        top_artistas = await get_top_artistas(access_token=access_token, quantitade=settings.QUANTIDADE_TOP_ARTISTAS, time_ranges=["short_term", "medium_term", "long_term"])
         
         rank_map = {}
         lista_artistas_para_adicionar = []

@@ -7,8 +7,7 @@ from app.services.extracao_de_letras import buscar_letras_em_batch
 from app.services.emotion_extraction_service import extrair_emocoes_batch_bedrock
 from app.models.faixa import UnifiedTrack
 from app.services.usuario_top_faixa_service import salvar_relacionamentos_top_faixas
-
-
+from app.core.config import settings
 
 async def salvar_top_faixas(user_id: str, access_token: str):
     print("iniciando salvamento de top faixas do usuario no banco de dados")
@@ -18,7 +17,7 @@ async def salvar_top_faixas(user_id: str, access_token: str):
         print("puxando top 10 faixas de todos os periodos de tempo")
         top_faixas = await get_top_faixas(
             access_token,
-            quantitade=1,
+            quantitade=settings.QUANTIDADE_TOP_FAIXAS,
             time_ranges=["short_term", "medium_term", "long_term"],
         )
 

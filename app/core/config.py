@@ -80,6 +80,9 @@ class Settings(BaseModel):
     SPOTIPY_CLIENT_SECRET: Optional[str] = Field(default_factory=lambda: os.getenv("SPOTIPY_CLIENT_SECRET"))
     SPOTIPY_REDIRECT_URI: Optional[str] = Field(default_factory=lambda: os.getenv("SPOTIPY_REDIRECT_URI"))
 
+    QUANTIDADE_TOP_FAIXAS: int = Field(default_factory=lambda: int(os.getenv("QUANTIDADE_TOP_FAIXAS", "20")))
+    QUANTIDADE_TOP_ARTISTAS: int = Field(default_factory=lambda: int(os.getenv("QUANTIDADE_TOP_ARTISTAS", "10")))
+
     # AWS e Serviços de IA
     AWS_ACCESS_KEY_ID: Optional[str] = Field(default_factory=lambda: os.getenv("AWS_ACCESS_KEY_ID"))
     AWS_SECRET_ACCESS_KEY: Optional[str] = Field(default_factory=lambda: os.getenv("AWS_SECRET_ACCESS_KEY"))

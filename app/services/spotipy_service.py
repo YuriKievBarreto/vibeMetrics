@@ -93,7 +93,7 @@ async def get_top_faixas(access_token: str, quantitade: int = 20, time_ranges: l
 
 async def get_top_artistas(
     access_token: str,
-    quantitade: int = 20,
+    quantitade: int = 10,
     time_ranges: list[str] = ["short_term"],
 ) -> UnifiedArtistsResponse:
     sp = await autenticar_sp(access_token)
