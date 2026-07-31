@@ -12,7 +12,7 @@ class Faixa(SQLModel, table=True):
     __tablename__ = "faixa"
     id_faixa: str = Field(primary_key=True, max_length=50)
     nome_faixa: str = Field(max_length=255)
-    emocoes: Optional[str] = Field(default=None, sa_type=JSON)
+    emocoes: Optional[dict[str, float]] = Field(default=None, sa_type=JSON)
     duracao_ms: int
     popularidade: int
     album: str = Field(max_length=255)

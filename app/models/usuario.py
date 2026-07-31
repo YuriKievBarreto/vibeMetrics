@@ -21,7 +21,7 @@ class Usuario(SQLModel, table=True):
     token_expires_at: Optional[datetime] = Field(default=None, sa_type=DateTime(timezone=True))
     ultima_atualizacao: Optional[datetime] = Field(default_factory=datetime.now().date(), sa_type=DateTime(timezone=True))
     status_processamento: Optional[str] = Field(default=None, max_length=512)
-    perfil_emocional: Optional[str] = Field(default=None, sa_type=JSON)
+    perfil_emocional: Optional[dict] = Field(default=None, sa_type=JSON)
 
     top_artistas_rel: List["UsuarioTopArtista"] = Relationship(back_populates="usuario")
     top_faixas_rel: List["UsuarioTopFaixa"] = Relationship(back_populates="usuario")

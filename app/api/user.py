@@ -6,6 +6,7 @@ from app.core.database import get_session
 from app.models.gerais import LogoutResponse, SessionStatusResponse
 from app.models.usuario import UserBasicData, PerfilMusical
 from app.models.usuario_top_faixa import TopFaixaResponse
+from app.core.config import settings
 from app.models.artista import UnifiedArtist
 from app.services.user_service import (
     validar_e_renovar_credenciais,
