@@ -74,8 +74,24 @@
   </footer>
 
  <script type="module">
-  import { LOGIN_URL } from "./utils.js";
+  import { LOGIN_URL, endereco_api_em_uso, endereco_frontend } from "./utils.js";
   
+  // Verificação silenciosa de sessão existente ao carregar a página
+  document.addEventListener("DOMContentLoaded", () => {
+    const CHECK_SESSION_URL = `${endereco_api_em_uso}/api/v1/user/current_session_user_id`;
+    fetch(CHECK_SESSION_URL, {
+      method: 'GET',
+      credentials: 'include'
+    })
+    .then(response => {
+      if (response.ok) {
+        console.log("Sessão ativa encontrada. Redirecionando para o dashboard...");
+        window.location.href = `${endereco_frontend}/frontend/dashboard.html`;
+      }
+    })
+    .catch(err => console.log("Nenhuma sessão ativa anterior detectada.", err));
+  });
+
   document.addEventListener("click", (e) => {
     if (e.target.id === "btn-entrar" || e.target.closest("#btn-entrar")) {
       e.preventDefault();
