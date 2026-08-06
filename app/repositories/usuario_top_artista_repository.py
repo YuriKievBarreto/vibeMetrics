@@ -23,8 +23,8 @@ async def ler_usuario_top_artistas(id_usuario: str, quantidade:int=None) -> list
         UsuarioTopArtista.short_time_rank.asc()
     ).limit(quantidade)
       
-   result =  await db.execute(stmt)
-   return list(result.scalars().all())
+      result = await db.execute(stmt)
+      return list(result.scalars().all())
 
 
 
