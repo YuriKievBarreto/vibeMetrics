@@ -153,6 +153,15 @@ function _criarOverlayProcessamento() {
     <p style="color: #6b7280; font-size: 0.8rem;">
       Esta tela vai atualizar automaticamente ✨
     </p>
+    <a href="dashboard.html"
+      style="margin-top: 8px; padding: 10px 24px; border-radius: 9999px;
+             background: transparent; border: 1.5px solid #374151;
+             color: #9ca3af; font-size: 0.875rem; font-weight: 500;
+             text-decoration: none; transition: border-color 0.2s, color 0.2s;"
+      onmouseover="this.style.borderColor='#22c55e';this.style.color='#22c55e';"
+      onmouseout="this.style.borderColor='#374151';this.style.color='#9ca3af';">
+      ← Voltar ao Dashboard
+    </a>
     <style>
       @keyframes spin { to { transform: rotate(360deg); } }
     </style>
