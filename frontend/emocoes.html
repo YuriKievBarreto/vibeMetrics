@@ -188,7 +188,7 @@
     </main>
 
     <script type="module">
-        import { API_PERFIL_MUSICAL_URL, HOME_URL, handleLogout } from "./utils.js";
+        import { API_PERFIL_MUSICAL_URL, HOME_URL, handleLogout, verificarStatusOuAguardar } from "./utils.js";
 
         const EMOTION_MAP = {
             'alegria': { color: 'yellow', emoji: '😄', gradient: 'gradient-yellow-orange' },
@@ -300,7 +300,10 @@
 
         document.getElementById("logoutButton").addEventListener("click", handleLogout);
 
-        document.addEventListener("DOMContentLoaded", loadEmotionData);
+        document.addEventListener("DOMContentLoaded", async () => {
+          const prosseguir = await verificarStatusOuAguardar(loadEmotionData);
+          if (prosseguir) loadEmotionData();
+        });
     </script>
 </body>
 </html>

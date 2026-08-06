@@ -126,7 +126,7 @@
   </main>
 
   <script type="module">
-    import { API_ARTISTS_URL, HOME_URL, RANK_MAP, BUTTON_ACTIVE_CLASSES, BUTTON_INACTIVE_CLASSES, handleLogout } from "./utils.js";
+    import { API_ARTISTS_URL, HOME_URL, RANK_MAP, BUTTON_ACTIVE_CLASSES, BUTTON_INACTIVE_CLASSES, handleLogout, verificarStatusOuAguardar } from "./utils.js";
     // ============================================================
     // CONFIGURAÇÃO E VARIÁVEIS GLOBAIS
     // ============================================================
@@ -319,7 +319,10 @@
         });
     });
 
-    document.addEventListener("DOMContentLoaded", loadInitialData);
+    document.addEventListener("DOMContentLoaded", async () => {
+      const prosseguir = await verificarStatusOuAguardar(loadInitialData);
+      if (prosseguir) loadInitialData();
+    });
   </script>
 
 </body>

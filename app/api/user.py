@@ -71,4 +71,11 @@ async def get_perfil_musical(
     current_user: Usuario = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_session)
 ) -> PerfilMusical | str:
-    return await obter_perfil_musical_usuario(current_user.id_usuario, db)
+    return await obter_perfil_musical_usuario(current_user.id_usuario, db)
+
+
+@user_router.get("/status")
+async def get_processing_status(
+    current_user: Usuario = Depends(get_current_active_user),
+) -> dict:
+    return {"status": current_user.status_processamento}
